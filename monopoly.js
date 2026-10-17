@@ -953,7 +953,7 @@ function Game() {
 
 
 	this.eliminatePlayer = function() {
-		// 2026-10-18：白饭核弹已触发 → 淘汰流程作废（触发者必胜）
+		// 2026-10-18：核弹已触发 → 淘汰流程作废（触发者必胜）
 		if (window.CNStars && window.CNStars.isLocked && window.CNStars.isLocked()) { return; }
 		var p = player[turn];
 
@@ -1002,7 +1002,7 @@ function Game() {
 	};
 
 	this.bankruptcyUnmortgage = function() {
-		// 2026-10-18：白饭核弹已触发 → 破产流程全部作废
+		// 2026-10-18：核弹已触发 → 破产流程全部作废
 		if (window.CNStars && window.CNStars.isLocked && window.CNStars.isLocked()) { return; }
 		var p = player[turn];
 

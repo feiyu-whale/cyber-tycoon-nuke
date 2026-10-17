@@ -262,7 +262,7 @@
     if(kind!=='mech' || card.name!=='复制'){ lastCard = card; }
 
     // 2026-10-18：所有卡（神明/武将/机制）都走升星流程
-    // 星级越高效果越强，集齐五张三星 → 白饭核弹
+    // 星级越高效果越强，集齐五张三星 → 核弹
     if(window.CNStars){
       window.CNStars.drawAndApply(p, card, kind);
       if(after) after();
