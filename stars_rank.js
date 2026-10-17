@@ -9,10 +9,21 @@
 (function(){
   'use strict';
 
-  var STAR_UP = { 1:1, 2:2, 3:4, 4:10 };    // 星级倍率
+  /* 星级倍率（2026-10-18 老爹定）
+   *   地煞星宿：三星 ×8
+   *   天罡星宿 / 武将卡 / 神明卡：三星 ×10
+   *   四星（彩蛋）：在各自三星基础上再放大 3 倍 */
+  var STAR_UP = { 1:1, 2:2, 3:10, 4:30 };      // 默认（天罡/武将/神明）
+  var STAR_UP_DI = { 1:1, 2:2, 3:8, 4:24 };     // 地煞专用
+
+  function starMultOf(card, kind){
+    var isDi = (kind === 'di') || (card && card.type === 'di');
+    return isDi ? STAR_UP_DI : STAR_UP;
+  }
   var NEED_2 = 3, NEED_3 = 9, NEED_4 = 27;   // 升星张数（3→9→27）
   var WIN_3STAR = 5;                          // 五张三星触发
   var decks = {};                             // decks[玩家序号][卡名] = 累计抽到张数
+  var retired = {};                           // 已升到三星、彻底绝版的卡（全服共享）
   var GAME_LOCKED = false;                    // 白饭核弹触发后锁死一切
 
   function deckOf(p){
@@ -42,17 +53,49 @@
     d[name] = (d[name] || 0) + 1;
     var cnt = d[name];
     var star = starOf(cnt);
-    var mult = STAR_UP[star];
+    var table = starMultOf(card, kind);
+    var mult = table[star];
 
     // 效果按星级放大：把 fn 里的金额放大，通过临时乘数实现
     window.__STAR_MULT = mult;
-    try { card.fn(p); } catch(e){ console.warn('[升星]', e); }
+    try {
+      if(typeof card.fn === 'function'){
+        // 武将卡 / 神明卡 / 机制卡
+        card.fn(p);
+      } else if(window.StarEngine && window.StarEngine.applyEffect){
+        // 星宿（天罡 / 地煞）——走引擎原效果
+        window.StarEngine.applyEffect(card, p);
+      }
+    } catch(e){ console.warn('[升星]', e); }
     window.__STAR_MULT = 1;
+
+    // 2026-10-18：三星额外触发专属技能（原效果 ×10 之后再叠加）
+    if(cnt === NEED_3){
+      // 武将/神明：卡自带 star3fn
+      if(typeof card.star3fn === 'function'){
+        try { card.star3fn(p); } catch(e){ console.warn('[三星专属]', e); }
+        if(window.addAlert) addAlert('【三星专属】'+card.name+'：'+(card.star3||''));
+      }
+      // 天罡星宿：从 CNCards.gang3 查表（地煞不配）
+      else if(window.CNCards && window.CNCards.gang3){
+        var g3 = window.CNCards.gang3(card.name);
+        if(g3){
+          try { g3.run(p); } catch(e){ console.warn('[天罡三星]', e); }
+          if(window.addAlert) addAlert('【天罡三星】'+card.name+'：'+g3.title);
+        }
+      }
+    }
 
     updateMoney(); updateOwned(); updatePosition();
 
     var wentThree = (cnt === NEED_3);
     var wentFour  = (cnt === NEED_4);
+
+    // 2026-10-18：一旦升到三星，这张卡彻底绝版（全服不再出现）
+    if(wentThree){
+      retired[name] = true;
+      if(window.addAlert) addAlert('【绝版】'+p.name+' 把「'+name+'」升到三星，此卡从此绝版，不再出现。');
+    }
     showStarUp(card, star, cnt, p, function(){
       // 彩蛋：任意一张卡合出「四星」→ 直接核弹
       if(wentFour){
@@ -64,6 +107,45 @@
         riceRocket(p, '五张三星');
       }
     }, kind);
+  }
+
+  /* 隐藏卡效果：把指定卡直升三星
+   * 2026-10-18：提升后「立刻按三星效果结算一次」（×4） */
+  function forceThree(p, cardName, cardObj){
+    var d = deckOf(p);
+    d[cardName] = Math.max(d[cardName] || 0, NEED_3);
+
+    if(window.addAlert){
+      addAlert('【无字天书】'+p.name+' 把「'+cardName+'」直接提到了三星。');
+    }
+
+    // 按三星效果立即结算一次（地煞 ×8，天罡/武将/神明 ×10）
+    var tbl = starMultOf(cardObj || {name:cardName}, null);
+    var mult = tbl[3];
+    window.__STAR_MULT = mult;
+    try {
+      if(cardObj && typeof cardObj.fn === 'function'){
+        cardObj.fn(p);
+      } else if(window.CNCards){
+        var found = null;
+        (window.CNCards.WARRIORS || []).concat(window.CNCards.GODS || []).forEach(function(c){
+          if(c.name === cardName) found = c;
+        });
+        if(found) found.fn(p);
+      }
+    } catch(e){ console.warn('[天书结算]', e); }
+    window.__STAR_MULT = 1;
+
+    if(window.addAlert){
+      addAlert('【无字天书】「'+cardName+'」按三星效果（×'+mult+'）结算一次。');
+    }
+
+    updateMoney(); updateOwned(); updatePosition();
+
+    // 检查是否因此凑满五张三星
+    if(threeStarCount(p) >= WIN_3STAR){
+      riceRocket(p, '五张三星');
+    }
   }
 
   /* 升星弹窗 */
@@ -82,6 +164,7 @@
         '<div style="font-size:11px;color:#8a7040;margin-bottom:10px">已收集 '+cnt+' 张 · 效果 ×'+STAR_UP[star]+'</div>' +
         '<div style="height:1px;background:linear-gradient(90deg,transparent,'+accent+'66,transparent);margin:10px 0 12px"></div>' +
         '<div style="font-size:13.5px;color:#e8dcc8;line-height:1.8;padding:0 2px">'+card.text+'</div>' +
+        (star>=3 && card.star3 ? '<div style="margin-top:10px;padding:8px;background:#2a1a08;border:1px solid #8a6f30;border-radius:8px;font-size:12px;color:#ffd86a;line-height:1.7">'+card.star3+'</div>' : '') +
         '<div style="margin-top:12px;font-size:10px;color:#5a4a3a">'+p.name+' · 三星 '+threeStarCount(p)+' / '+WIN_3STAR+'</div>' +
       '</div>' +
       '<button class="star-btn" id="cncardbtn" style="background:linear-gradient(160deg,'+accent+',#8a6f30);color:#1a1208">收 下</button>';
@@ -169,9 +252,12 @@
 
   /* 导出 */
   window.CNStars = {
+    isRetired: function(name){ return !!retired[name]; },
+    retiredList: function(){ return retired; },
     isLocked: function(){ return GAME_LOCKED; },
     unlock: function(){ GAME_LOCKED = false; window.__RICE_WINNER = null; },
     drawAndApply: drawAndApply,
+    forceThree: forceThree,
     starOf: starOf,
     threeStarCount: threeStarCount,
     deckOf: deckOf,

@@ -953,7 +953,7 @@ function Game() {
 
 
 	this.eliminatePlayer = function() {
-		// 2026-10-18：核弹已触发 → 淘汰流程作废（触发者必胜）
+		// 2026-10-18：白饭核弹已触发 → 淘汰流程作废（触发者必胜）
 		if (window.CNStars && window.CNStars.isLocked && window.CNStars.isLocked()) { return; }
 		var p = player[turn];
 
@@ -1002,7 +1002,7 @@ function Game() {
 	};
 
 	this.bankruptcyUnmortgage = function() {
-		// 2026-10-18：核弹已触发 → 破产流程全部作废
+		// 2026-10-18：白饭核弹已触发 → 破产流程全部作废
 		if (window.CNStars && window.CNStars.isLocked && window.CNStars.isLocked()) { return; }
 		var p = player[turn];
 
@@ -1118,6 +1118,8 @@ function Player(name, color) {
 	this.color = color;
 	this.position = 0;
 	this.money = 5000;
+	this.coins = 5;          // 2026-10-18 金币：1 金币 = 10000 现金
+	this.shopLevel = 1;      // 商店等级（每局重置）
 	this.creditor = -1;
 	this.jail = false;
 	this.jailroll = 0;
@@ -1390,6 +1392,8 @@ function updateMoney() {
 		$("#moneybarrow" + i).show();
 		document.getElementById("p" + i + "moneybar").style.border = "2px solid " + p_i.color;
 		document.getElementById("p" + i + "money").innerHTML = fmtMoney(p_i.money).replace("$","");
+		var cEl = document.getElementById("p" + i + "coins");
+		if (cEl) cEl.textContent = (p_i.coins || 0) + "💰";
 		document.getElementById("p" + i + "moneyname").innerHTML = p_i.name;
 	}
 
@@ -1956,7 +1960,8 @@ function advance(destination, pass) {
 		} else {
 			p.position = pass;
 			p.money += 200;
-			addAlert(p.name + " 经过起点，领取 $200。");
+			p.coins = (p.coins || 0) + 1;
+		addAlert(p.name + " 经过起点，领取 $200，并获得 1 金币。");
 		}
 	}
 	if (p.position < destination) {
@@ -1964,7 +1969,8 @@ function advance(destination, pass) {
 	} else {
 		p.position = destination;
 		p.money += 200;
-		addAlert(p.name + " 经过起点，领取 $200。");
+		p.coins = (p.coins || 0) + 1;
+		addAlert(p.name + " 经过起点，领取 $200，并获得 1 金币。");
 	}
 
 	land();
@@ -1980,7 +1986,8 @@ function advanceToNearestUtility() {
 	} else if (p.position >= 28) {
 		p.position = 12;
 		p.money += 200;
-		addAlert(p.name + " 经过起点，领取 $200。");
+		p.coins = (p.coins || 0) + 1;
+		addAlert(p.name + " 经过起点，领取 $200，并获得 1 金币。");
 	}
 
 	land(true);
@@ -1998,7 +2005,8 @@ function advanceToNearestRailroad() {
 	} else if (p.position >= 35) {
 		p.position = 5;
 		p.money += 200;
-		addAlert(p.name + " 经过起点，领取 $200。");
+		p.coins = (p.coins || 0) + 1;
+		addAlert(p.name + " 经过起点，领取 $200，并获得 1 金币。");
 	}
 
 	land(true);
@@ -2378,7 +2386,8 @@ function moveAnimated(steps, callback) {
 			p.position = (p.position + 1) % 40;
 			if (p.position === 0) {
 				p.money += 200;
-				addAlert(p.name + " 经过起点，领取 $200。");
+				p.coins = (p.coins || 0) + 1;
+		addAlert(p.name + " 经过起点，领取 $200，并获得 1 金币。");
 				updateMoney();
 			}
 		} else {
@@ -2813,6 +2822,11 @@ function setup() {
 
 	$("#board, #moneybar").show();
 	$("#setup").hide();
+
+	// 2026-10-18：开局掷一次隐藏卡出现概率（10%）
+	if (window.CNCards && window.CNCards.rollHiddenPresence) {
+		window.CNCards.rollHiddenPresence();
+	}
 
 	// 2026-10-17 修复：显示棋盘后浏览器可能自动横向滚动，强制回正
 	setTimeout(function () {

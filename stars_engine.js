@@ -583,6 +583,8 @@
     drawStar: drawStar,
     getDex: function(){ return dexMap; },
     getDexCount: getDexCount,
+    applyEffect: applyEffect,
+    stars: function(){ return STAR_DB; },
     isReady: function(){ return DB_READY; },
     load: loadStars
   };
