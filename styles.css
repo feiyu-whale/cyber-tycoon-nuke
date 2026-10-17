@@ -1,0 +1,1705 @@
+body {
+	background: #FFFFFF;
+	margin: 0px;
+	min-width: 1075px;
+}
+
+td {
+	font-size: 12px;
+	font-family: arial, sans-serif;
+	border: 1px solid black;
+	text-align: center;
+}
+
+#setup {
+	display: none;
+	margin: 15px;
+}
+
+#moneybar {
+	float: right;
+	border: 0px solid black;
+	background-color: white;
+	margin: 15px;
+	border-radius: 5px;
+	display: none;
+	z-index: 14;
+	position: relative;
+	cursor: default;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+#moneybar table {
+	font-weight: bold;
+	border-spacing: 1px;
+}
+
+#moneybarwrap {
+	position: absolute;
+	min-width: 135px;
+	top: 0px;
+	right: 0px;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+#propertystats {
+	margin-right: 110px;
+}
+
+#refresh {
+	display: none;
+	margin: 15px;
+}
+
+#noF5 {
+	display: none;
+}
+
+#noscript {
+	margin-left: 10px;
+}
+
+#board {
+	display: none;
+	border: 2px solid black;
+	border-spacing: 3px;
+	margin: 25px;
+	float: left;
+}
+
+#jail {
+	border: 1px solid black;
+	height: 65px;
+	width: 65px;
+	position: relative;
+	top: 73px;
+	left: -73px;
+	z-index: 2;
+}
+
+
+#control {
+	position: absolute;
+	z-index: 9;
+	top: 250px;
+	left: 250px;
+	border: 2px solid black;
+	padding: 10px;
+	display: none;
+	background-color: white;
+}
+
+#quickstats {
+	font-size: 12px;
+	font-weight: bold;
+	font-family: arial, sans-serif;
+	border: 2px solid blue;
+	margin: 5px;
+	padding: 3px;
+	width: 80px;
+}
+
+#pname {
+	background-color: white;
+}
+
+#landed {
+	padding: 3px;
+	border: 1px solid gray;
+	border-top: none;
+	width: 302px;
+
+	margin: 0px;
+	text-align: center;
+}
+
+#alert {
+	width: 307px;
+	height: 92px;
+	margin: 0px;
+	padding-left: 1px;
+	border: 1px solid gray;
+	font-family: Consolas, "Courier New", monospace;
+	font-size: 13px;
+	background-color: #FFFFFF;
+	overflow-y: scroll;
+}
+
+#manage {
+	width: 308px;
+	border: 1px solid gray;
+	display: none;
+}
+
+#option {
+	border-bottom: 1px solid gray;
+	background-color: white;
+	display: none;
+	background: white;
+	vertical-align: middle;
+	padding: 3px;
+	text-align: center;
+	min-height: 26px;
+}
+
+#buildings {
+	margin: auto;
+	height: 21px;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+#buildings .house {
+	width: 25px;
+	height: 19px;
+	vertical-align: top;
+	float: none;
+}
+
+#buildings .hotel {
+	width: 26px;
+	height: 19px;
+	vertical-align: top;
+	float: none;
+}
+
+#owned {
+	padding: 3px 0px;
+	background-color: white;
+	text-align: center;
+	max-height: 390px;
+	overflow-y: auto;
+}
+
+#owned .propertycellname {
+	vertical-align: top;
+}
+
+#property {
+	margin-right: 1px;
+	background: white;
+}
+
+#trade {
+	border: 2px solid black;
+	display: none;
+	width: 630px;
+	margin: 15px auto;
+	background-color: white;
+	border-radius: 8px;
+	padding: 2px;
+	z-index: 14;
+}
+
+#trade-leftp-name {
+	font-size: 13px;
+	font-weight: bold;
+}
+
+#trade-leftp-name option {
+	font-size: 13px;
+	font-weight: normal;
+}
+
+#trade-rightp-name {
+	font-size: 13px;
+	font-weight: bold;
+}
+
+#trade-rightp-name option {
+	font-size: 13px;
+	font-weight: normal;
+}
+
+#trade-leftp-money {
+	width: 90%;
+}
+
+#trade-rightp-money {
+	width: 90%;
+}
+
+#deedcolor {
+	background: white;
+	width: 100%;
+	height: 48px;
+}
+
+#deedname {
+	margin-top: 10px;
+	font-weight: bold;
+	font-size: 20px;
+	background-color: white;
+}
+
+#menu {
+	width: 290px;
+	height: 32px;
+	margin: 0px 10px;
+}
+
+#menutable {
+	padding: 0px;
+	text-align: left;
+	font-family: arial, sans-serif;
+	color: white;
+	font-weight: bold;
+	font-size: 16px;
+	border: 1px solid blue;
+	border-radius: 5px 5px 0px 0px;
+	height: 30px;
+	width: 99%;
+	margin: 0px;
+	background-color: #305BC9;
+	/* background-image: -webkit-linear-gradient(bottom,#213EB2,#4787ED);
+	background-image: -moz-linear-gradient(bottom,#213EB2,#4787ED); */
+	background-image: url(images/menu_background.png);
+	/* background-repeat: repeat-x; */
+	overflow: hidden;
+}
+
+#menutable td {
+	vertical-align: top;
+}
+
+#menu a {
+	color: #FFFFFF;
+	text-decoration: none;
+	display: block;
+	height: 100%;
+	width: 100%;
+	padding-top: 8px;
+}
+
+#buy-menu-item {
+	color: #FFFFFF;
+	margin-left: 2px;
+	border-left: none;
+}
+
+#trade-menu-item {
+	color: #AAAAAA;
+	border-right: none;
+	margin-right: 2px;
+}
+
+
+#popup {
+	width: 300px;
+	min-width: 300px;
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	padding: 10px;
+	text-align: center;
+	word-wrap: break-word;
+	line-height: 1.5;
+	border: 2px solid black;
+	border-radius: 10px;
+	background-color: white;
+	display: block;
+	z-index: 13;
+	margin: auto;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+#popupwrap {
+	position: absolute;
+	top: 255px;
+	left: 0px;
+	width: 100%;
+	display: none;
+	background-color: transparent;
+	z-index: 13;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+#popuptext {
+	overflow-x: auto;
+}
+
+/* #popupclose {
+	display: none;
+	position: absolute;
+	top: -24px;
+	right: -25px;
+	width: 30px;
+	height: 30px;
+	border: none;
+	cursor: pointer;
+	overflow: visible;
+	z-index: 12;
+} */
+
+#popupclose input {
+	margin: 0px;
+	background-color: red;
+	height: 18px;
+	width: 18px;
+	padding: 0px;
+}
+
+#popupbackground {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0px;
+	left: 0px;
+	background-color: #000000;
+	opacity: 0.5;
+	display: none;
+	z-index: 10;
+}
+
+#popupdrag {
+	width: 100%;
+	height: 16px;
+	position: absolute;
+	top: -16px;
+	cursor: move;
+}
+
+#stats {
+	max-width: 914px;
+	min-width: 454px;
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	padding: 10px;
+	text-align: center;
+	word-wrap: break-word;
+	line-height: 1.5;
+	border: 2px solid black;
+	border-radius: 10px;
+	background-color: white;
+	display: block;
+	z-index: 17;
+	margin: auto;
+	position: relative;
+	top: 0px;
+	left: 0px;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+#statswrap {
+	position: absolute;
+	top: 250px;
+	left: 0px;
+	width: 100%;
+	display: none;
+	background-color: transparent;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+#statstext {
+	overflow: hidden;
+	min-height: 70px;
+}
+
+#statsclose {
+	display: block;
+	position: absolute;
+	top: -24px;
+	right: -25px;
+	width: 30px;
+	height: 30px;
+	border: none;
+	cursor: pointer;
+	overflow: visible;
+	z-index: 17;
+}
+
+#statsbackground {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0px;
+	left: 0px;
+	background-color: #000000;
+	opacity: .5;
+	display: none;
+	z-index: 16;
+}
+
+#statsdrag {
+	width: 100%;
+	height: 16px;
+	position: absolute;
+	top: -16px;
+	cursor: move;
+}
+
+#deed {
+	display: none;
+	position: fixed;
+	border: 2px solid black;
+	width: 235px;
+	height: 275px;
+	background-color: white;
+	z-index: 18;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+#deed td{
+	border: none;
+}
+
+#deed-header {
+	width: 215px;
+	height: 48px;
+	border: 1px solid black;
+	margin: 9px;
+	background-color: yellow;
+	text-align: center;
+	text-transform: uppercase;
+	font-family: Calibri, Arial;
+}
+
+#deed-name {
+	font-size: 15px;
+	font-weight: bold;
+
+}
+
+#deed-table {
+	margin: 9px;
+	width: 217px;
+	border-spacing: 1px;
+}
+
+#deed-mortgaged {
+	font-family: Calibri, Arial;
+	font-size: 16px;
+	text-align: center;
+
+}
+
+#deed-mortgaged-name {
+	font-size: 18px;
+	font-weight: bold;
+	text-transform: uppercase;
+	margin: 30px 20px 20px;
+}
+
+#deed-special {
+	font-family: Calibri, Arial;
+	text-align: justify;
+}
+
+#deed-special-name {
+	text-align: center;
+	font-size: 18px;
+	font-weight: bold;
+	border-style: solid;
+	border-width: 2px 0px;
+	text-transform: uppercase;
+	margin: 50px 20px 20px;
+}
+
+#deed-special-text {
+	margin: 20px;
+	font-size: 15px;
+}
+
+#deed-special-footer {
+	margin: 0px 20px;
+	width: 195px;
+	position: absolute;
+	bottom: 20px;
+	font-size: 16px;
+}
+
+#enlarge-wrap {
+	border: none;
+	z-index: 0;
+}
+
+.menu-item:hover {
+	/* background-image: -webkit-linear-gradient(bottom,#000080,#4787ED);
+	background-image: -moz-linear-gradient(bottom,#000080,#4787ED); */
+
+	background-image: url(images/menu_background_hover.png);
+}
+
+.menu-item {
+	padding: 0px;
+	border-collapse: collapse;
+	text-align: center;
+	display: table-cell;
+	background-color: transparent;
+	border: none;
+	border-right: 2px solid white;
+	height: 30px;
+	min-width: 90px;
+	width: 90px;
+	max-width: 90px;
+	overflow: hidden;
+}
+
+.die {
+	display: none;
+	margin: 5px;
+	float: left;
+}
+
+.die-no-img {
+
+
+	border-radius: 6px;
+	font-weight: bold;
+	border: 2px solid black;
+	padding: 5px 10px;
+}
+.house {
+	width: 25px;
+	height: 19px;
+	vertical-align: middle;
+	float: right;
+}
+
+.hotel {
+	width: 26px;
+	height: 19px;
+	vertical-align: middle;
+	float: right;
+}
+
+.cell {
+	position: relative;
+	top: 0px;
+	left: 0px;
+	padding: 0px;
+	vertical-align: bottom;
+	background-repeat: no-repeat;
+	background-size: auto 40px;
+}
+
+.board-center {
+	width: 675px;
+	border: none;
+	vertical-align: bottom;
+	background-repeat: no-repeat;
+	background-size: auto 40px;
+}
+
+.board-corner {
+	width: 102px;
+	height: 102px;
+}
+
+.board-top {
+	width: 72px;
+	height: 102px;
+}
+
+.board-bottom {
+	width: 72px;
+	height: 102px;
+}
+
+.board-left {
+	width: 102px;
+	height: 72px;
+}
+
+.board-right {
+	width: 102px;
+	height: 72px;
+}
+
+.enlarge {
+	width: 150px;
+	height: 200px;
+	display: none;
+	background-color: white;
+	border: 2px solid black;
+	text-align: center;
+	font-size: 12px;
+	font-family: arial, sans-serif;
+	position: fixed;
+	z-index: 15;
+}
+
+.enlarge-color {
+	background: white;
+	width: 100%;
+	height: 40px;
+}
+
+.enlarge-name {
+	font-weight: bold;
+	font-size: 20px;
+	background-color: white;
+	height: 45px;
+}
+
+.enlarge-price {
+	background-color: white;
+	vertical-align: bottom;
+	height: 25px;
+}
+
+.enlarge-token {
+	height: 45px;
+	width: 150px;
+}
+
+.moneybarcell {
+	width: 83px;
+	min-width: 83px;
+}
+
+.moneybararrowcell {
+	background: white;
+	width: 30px;
+	border: none;
+	text-align: right;
+	padding: 0px;
+}
+
+.money-bar-arrow {
+	height: 30px;
+	width: 30px;
+}
+.propertycellcheckbox {
+	width: 20px;
+	height: 20px;
+	border: none;
+	vertical-align: middle;
+}
+
+.propertycellcolor {
+	padding: 0px;
+	width: 20px;
+	height: 20px;
+	border-width: 1px;
+	border-style: solid;
+	border-color: white;
+}
+
+.propertycellname {
+	height: 20px;
+	width: 250px;
+	border: none;
+	cursor: default;
+	text-align: left;
+	vertical-align: middle;
+}
+
+.propertycelldeed {
+	width: 18px;
+	height: 20px;
+	border: 1px solid grey;
+	cursor: pointer;
+	display: none;
+}
+
+.statscellcolor {
+	padding: 0px;
+	width: 22px;
+	height: 20px;
+	border: none;
+}
+
+.statscellname {
+	height: 20px;
+	border: none;
+	cursor: default;
+	text-align: left;
+	min-width: 172px;
+}
+
+.statsplayername {
+	font-weight: bold;
+	font-size: 24px;
+}
+
+.statscell {
+	border: 2px solid black;
+	padding: 8px;
+	vertical-align: top;
+	width: 202px;
+	min-width: 115px;
+}
+
+.trade-cell {
+	border: none;
+	border-radius: 3px;
+	width: 308px;
+	height: 26px;
+	vertical-align: middle;
+}
+
+.cell-anchor {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	bottom: 0px;
+	left: 0px;
+}
+
+.cell-name {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	text-align: center;
+	width: 100%;
+}
+
+.cell-position-holder {
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	position: relative;
+}
+
+.cell-position {
+	height: 15px;
+	width: 15px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	border-radius: 50%;
+	border: 2px solid #fff;
+	box-shadow: 0 0 6px rgba(0,0,0,.8), 0 0 3px rgba(255,255,255,.6);
+	z-index: 5;
+}
+
+.cell-owner {
+	background-size: cover;
+	display: none;
+	position: absolute;
+}
+
+.board-top .cell-owner {
+	background-image: url("images/hori-bar.png");
+
+	height: 15px;
+	left: 0px;
+
+
+
+	top: -25px;
+	width: 72px;
+
+}
+
+.board-bottom .cell-owner {
+	background-image: url("images/hori-bar.png");
+	bottom: -25px;
+
+	height: 15px;
+
+
+
+
+	left: 0px;
+	width: 72px;
+}
+
+.board-left .cell-owner {
+	background-image: url("images/vert-bar.png");
+
+	height: 68px;
+	left: -25px;
+
+
+
+	top: 0px;
+	width: 15px;
+
+}
+
+.board-right .cell-owner {
+	background-image: url("images/vert-bar.png");
+
+	height: 68px;
+	right: -25px;
+
+
+
+	top: 0px;
+	width: 15px;
+
+}
+
+/* ============================================================
+   2026-10-17 换皮：按游戏厅深蓝主题重做
+   ============================================================ */
+body {
+	background: radial-gradient(120% 80% at 50% 0%, #14283a 0%, #0a1622 60%, #060a10 100%) fixed !important;
+	color: #dbeafe !important;
+	font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif !important;
+	min-width: 0 !important;
+	overflow-x: auto;
+}
+
+td { border-color: #24384c !important; color: #dbeafe; }
+
+#board {
+	border: 2px solid #2e4a63 !important;
+	border-radius: 10px;
+	background: #0b1420;
+	box-shadow: 0 0 24px rgba(20, 60, 100, .35);
+}
+
+.board-center { background-color: #0b1420; }
+.board-corner { background-color: #0e1a26; }
+
+.cell { background-color: #0e1a26; }
+.cell-name { color: #cfe4f5; font-weight: 600; }
+.cell-owner { color: #9fe0ff; }
+.cell-position { color: #ffd860; }
+
+#control, #setup, #alert, #deed, #moneybar, #quickstats {
+	background: #0e1a26 !important;
+	border: 1px solid #2e4a63 !important;
+	border-radius: 12px;
+	color: #dbeafe !important;
+	box-shadow: 0 4px 18px rgba(0, 0, 0, .45);
+}
+
+#control { padding: 14px; }
+#landed { border-color: #2e4a63 !important; color: #cfe4f5; }
+#pname { background: #060a10 !important; color: #9fe0ff !important; border: 1px solid #24384c; border-radius: 7px; padding: 5px 8px; }
+
+input[type=text], input[type=number], select {
+	background: #060a10 !important;
+	color: #9fe0ff !important;
+	border: 1px solid #24384c !important;
+	border-radius: 8px;
+	padding: 7px 10px;
+	font-family: inherit;
+}
+
+input[type=button], input[type=submit], button {
+	background: linear-gradient(160deg, #2e6ea8, #1b4670) !important;
+	color: #fff !important;
+	border: 1px solid #4d8fc9 !important;
+	border-radius: 9px;
+	padding: 9px 14px;
+	font-weight: 600;
+	font-family: inherit;
+	cursor: pointer;
+}
+
+input[type=button]:hover, button:hover { filter: brightness(1.15); }
+input[type=button]:active, button:active { transform: scale(.98); }
+
+#alert { color: #cfe4f5 !important; }
+#deed { color: #dbeafe; }
+#deed-header { color: #9fe0ff; }
+
+.house, .hotel { filter: none; }
+
+/* 弹窗遮罩 */
+#popupbackground, #statsbackground { background: rgba(0, 0, 0, .78) !important; }
+#popup, #stats {
+	background: #0e1a26 !important;
+	border: 1px solid #2e4a63 !important;
+	border-radius: 12px;
+	color: #dbeafe !important;
+}
+
+/* 手机上让棋盘可横向滑动 */
+@media (max-width: 1100px) {
+	body { min-width: 0 !important; }
+	#board { margin: 10px auto !important; transform-origin: top left; }
+}
+
+/* ============================================================
+   2026-10-17 设置页重做：居中 + 手机竖排 + 大触控
+   ============================================================ */
+#setup {
+	display: block;
+	max-width: 520px;
+	margin: 0 auto !important;
+	padding: 18px 16px 26px !important;
+	background: #0e1a26 !important;
+	border: 1px solid #2e4a63 !important;
+	border-radius: 16px;
+	box-shadow: 0 8px 32px rgba(0,0,0,.5);
+	position: relative;
+	margin: 16px auto !important;
+}
+
+/* 标题 */
+#setup::before {
+	content: "🏠 大富翁";
+	display: block;
+	text-align: center;
+	font-size: 20px;
+	font-weight: 800;
+	color: #9fe0ff;
+	letter-spacing: 2px;
+	margin-bottom: 4px;
+	text-shadow: 0 0 16px rgba(100,180,255,.4);
+}
+#setup::after {
+	content: "买地 · 收租 · 盖房 · 让对手破产";
+	display: block;
+	text-align: center;
+	font-size: 11px;
+	color: #5b7a99;
+	margin-bottom: 16px;
+}
+
+/* 玩家人数行 */
+#setup > div:first-of-type {
+	text-align: center;
+	font-size: 13px;
+	color: #8fb3cf;
+	margin-bottom: 14px !important;
+}
+#playernumber { min-width: 70px; height: 38px; font-size: 14px; }
+
+/* 每个玩家一块 */
+.player-input {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	background: #0b1420;
+	border: 1px solid #24384c;
+	border-radius: 11px;
+	padding: 10px;
+	margin-bottom: 9px;
+	font-size: 13px;
+	color: #8fb3cf;
+	transition: border-color .2s;
+}
+.player-input:focus-within { border-color: #4d8fc9; }
+
+.player-input input[type=text] {
+	flex: 1 1 120px;
+	min-width: 90px;
+	height: 40px;
+	font-size: 14px;
+}
+
+.player-input select {
+	flex: 0 0 auto;
+	height: 40px;
+	font-size: 13px;
+	min-width: 88px;
+}
+
+/* 开始按钮 */
+#setup > div[style*="margin: 20px 0px"] {
+	margin: 18px 0 10px !important;
+}
+#setup input[value="开始游戏"] {
+	width: 100%;
+	height: 52px;
+	font-size: 17px;
+	font-weight: 800;
+	letter-spacing: 2px;
+	background: linear-gradient(160deg, #2e8ec9, #1b5a90) !important;
+	border: 1px solid #5aa8e0 !important;
+	border-radius: 12px !important;
+	box-shadow: 0 4px 16px rgba(40,120,200,.4);
+}
+
+/* 警告 */
+#noF5 {
+	text-align: center;
+	font-size: 11px;
+	color: #5b7a99;
+	border: none !important;
+	line-height: 1.7;
+	margin-top: 10px;
+}
+
+/* 手机竖排 */
+@media (max-width: 430px) {
+	#setup { border-radius: 0; border-left: none; border-right: none; margin: 0 !important; padding-bottom: 30px !important; }
+	.player-input { flex-direction: column; align-items: stretch; }
+	.player-input input[type=text],
+	.player-input select { width: 100%; flex: 1 1 auto; }
+	#setup::before { font-size: 18px; }
+}
+
+/* ============================================================
+   2026-10-17 美化 v2：压紧 + 质感
+   ============================================================ */
+#setup {
+	background: linear-gradient(180deg, #101e2c 0%, #0a1420 100%) !important;
+	border: 1px solid #35597a !important;
+	box-shadow: 0 10px 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(120,180,230,.12);
+}
+
+#setup::before {
+	font-size: 19px !important;
+	background: linear-gradient(90deg, #7fd4ff, #b8e6ff, #7fd4ff);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	text-shadow: none !important;
+	letter-spacing: 3px;
+	margin-bottom: 2px !important;
+}
+#setup::after { margin-bottom: 10px !important; font-size: 10.5px !important; }
+
+/* 压紧玩家卡片 */
+.player-input {
+	padding: 7px 9px !important;
+	margin-bottom: 6px !important;
+	gap: 6px !important;
+	background: linear-gradient(180deg, #0e1a28, #0a1420) !important;
+	border: 1px solid #2a455e !important;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+	position: relative;
+	overflow: hidden;
+}
+
+/* 左侧色条 —— 用 data 属性驱动 */
+.player-input::before {
+	content: "";
+	position: absolute;
+	left: 0; top: 0; bottom: 0;
+	width: 4px;
+	background: #4d8fc9;
+	border-radius: 11px 0 0 11px;
+	transition: background .25s;
+}
+#player1input::before { background: #e8d24a; }
+#player2input::before { background: #4a7de8; }
+#player3input::before { background: #e84a4a; }
+#player4input::before { background: #7de84a; }
+#player5input::before { background: #d24ae8; }
+#player6input::before { background: #4ae8d2; }
+#player7input::before { background: #e8844a; }
+#player8input::before { background: #b0b0b0; }
+
+.player-input input[type=text],
+.player-input select {
+	height: 36px !important;
+	font-size: 13.5px !important;
+	background: #060d16 !important;
+	border: 1px solid #2a455e !important;
+	transition: border-color .2s, box-shadow .2s;
+}
+.player-input input[type=text]:focus,
+.player-input select:focus {
+	border-color: #5aa8e0 !important;
+	box-shadow: 0 0 0 2px rgba(90,168,224,.18);
+}
+
+/* 颜色下拉加色块感 */
+select[id$="color"] {
+	font-weight: 700;
+	background-image: linear-gradient(45deg, transparent 50%, #6b8fb3 50%), linear-gradient(135deg, #6b8fb3 50%, transparent 50%);
+	background-position: calc(100% - 14px) center, calc(100% - 9px) center;
+	background-size: 5px 5px, 5px 5px;
+	background-repeat: no-repeat;
+	-webkit-appearance: none;
+	appearance: none;
+	padding-right: 26px !important;
+}
+
+/* 人数选择器 */
+#playernumber {
+	background: #060d16 !important;
+	border: 1px solid #2a455e !important;
+	border-radius: 9px;
+	font-weight: 700;
+	color: #7fd4ff !important;
+	height: 36px !important;
+}
+
+/* 开始按钮 —— 更醒目 */
+#setup input[value="开始游戏"] {
+	height: 48px !important;
+	font-size: 16px !important;
+	background: linear-gradient(160deg, #38a0e0 0%, #1e6fb0 50%, #14578c 100%) !important;
+	border: 1px solid #6cc0f0 !important;
+	border-radius: 13px !important;
+	box-shadow: 0 5px 20px rgba(40,140,220,.45), inset 0 1px 0 rgba(255,255,255,.25);
+	text-shadow: 0 1px 3px rgba(0,0,0,.4);
+	transition: transform .12s, box-shadow .12s;
+}
+#setup input[value="开始游戏"]:active {
+	transform: translateY(1px) scale(.995);
+	box-shadow: 0 2px 10px rgba(40,140,220,.35);
+}
+
+/* 手机：再压一点，让 4 人一屏 */
+@media (max-width: 430px) {
+	#setup { padding: 12px 12px 18px !important; }
+	#setup::before { font-size: 17px !important; margin-bottom: 0 !important; }
+	#setup::after { font-size: 10px !important; margin-bottom: 8px !important; }
+	#setup > div:first-of-type { margin-bottom: 8px !important; font-size: 12px !important; }
+	.player-input { padding: 6px 8px !important; margin-bottom: 5px !important; gap: 5px !important; }
+	.player-input input[type=text], .player-input select { height: 32px !important; font-size: 13px !important; }
+	#setup input[value="开始游戏"] { height: 44px !important; font-size: 15px !important; }
+	#noF5 { font-size: 10px !important; margin-top: 6px !important; }
+	#setup > div[style*="margin: 20px 0px"] { margin: 10px 0 6px !important; }
+}
+
+/* 2026-10-17 棋盘地标图标 */
+.cell-landmark {
+	position: absolute;
+	bottom: 1px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 34px;
+	height: 34px;
+	object-fit: contain;
+	opacity: .92;
+	pointer-events: none;
+	z-index: 1;
+	filter: drop-shadow(0 1px 2px rgba(0,0,0,.5));
+}
+.board-top .cell-landmark    { bottom: auto; top: 1px; }
+.board-left .cell-landmark   { bottom: auto; left: 1px; transform: none; top: 50%; margin-top: -17px; }
+.board-right .cell-landmark  { bottom: auto; right: 1px; left: auto; transform: none; top: 50%; margin-top: -17px; }
+@media (max-width: 430px) {
+	.cell-landmark { width: 26px; height: 26px; }
+}
+
+
+
+
+/* ============================================================
+   2026-10-17 横屏方案：棋盘保持原尺寸，竖屏提示转横屏
+   ============================================================ */
+#board {
+	float: none !important;
+	margin: 8px auto !important;
+}
+
+#boardwrap {
+	width: 100%;
+	overflow-x: auto;
+	overflow-y: hidden;
+	-webkit-overflow-scrolling: touch;
+	padding: 4px 0;
+}
+
+/* 竖屏提示遮罩 */
+#rotateHint {
+	position: fixed;
+	inset: 0;
+	z-index: 9999;
+	background: rgba(6, 10, 16, .96);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	text-align: center;
+}
+#rotateHint.on { display: flex; }
+#rotateHint .box {
+	background: linear-gradient(180deg, #101e2c, #0a1420);
+	border: 1px solid #35597a;
+	border-radius: 18px;
+	padding: 30px 26px;
+	max-width: 320px;
+	box-shadow: 0 10px 40px rgba(0,0,0,.6);
+}
+#rotateHint .ico {
+	font-size: 48px;
+	margin-bottom: 14px;
+	display: inline-block;
+	animation: rotateAnim 2s ease-in-out infinite;
+}
+@keyframes rotateAnim {
+	0%, 30% { transform: rotate(0deg); }
+	60%, 100% { transform: rotate(90deg); }
+}
+#rotateHint .tt {
+	font-size: 17px;
+	font-weight: 800;
+	color: #9fe0ff;
+	margin-bottom: 10px;
+	letter-spacing: 1px;
+}
+#rotateHint .dd {
+	font-size: 12.5px;
+	color: #8fb3cf;
+	line-height: 1.8;
+}
+#rotateHint .btn {
+	margin-top: 18px;
+	padding: 10px 20px;
+	font-size: 13px;
+	font-weight: 600;
+	font-family: inherit;
+	color: #dbeafe;
+	background: #1a2a3a;
+	border: 1px solid #35597a;
+	border-radius: 20px;
+	cursor: pointer;
+}
+
+
+/* ============================================================
+ * 星宿版专属样式（2026-10-17）
+ * 弹窗美化 + 棋子强化
+ * ============================================================ */
+
+/* 星宿弹窗整体：黑金卡片 */
+#popup.star-popup {
+	background: linear-gradient(160deg, #1a1208 0%, #0d0a06 100%) !important;
+	border: 1px solid #6a5020 !important;
+	border-radius: 16px !important;
+	box-shadow: 0 0 40px rgba(255, 200, 90, .18), 0 8px 32px rgba(0,0,0,.7) !important;
+	color: #e8dcc8 !important;
+	font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif !important;
+	padding: 0 !important;
+	overflow: hidden;
+}
+
+#popup.star-popup.di {
+	background: linear-gradient(160deg, #1a0a10 0%, #0d0608 100%) !important;
+	border-color: #7a2a3a !important;
+	box-shadow: 0 0 40px rgba(255, 90, 120, .18), 0 8px 32px rgba(0,0,0,.7) !important;
+}
+
+/* 弹窗里的确认按钮 */
+#popup .star-btn {
+	display: block;
+	width: calc(100% - 24px);
+	margin: 0 12px 14px;
+	padding: 11px;
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 2px;
+	color: #1a1208;
+	background: linear-gradient(160deg, #ffd86a, #d4a020);
+	border: none;
+	border-radius: 10px;
+	font-family: inherit;
+	cursor: pointer;
+}
+
+#popup.di .star-btn {
+	color: #fff0f2;
+	background: linear-gradient(160deg, #d94a62, #8a2438);
+}
+
+#popup .star-btn:active { transform: scale(.98); }
+
+/* 棋子强化（覆盖原有） */
+/* 棋子：更大、更亮、带呼吸光 */
+.cell-position {
+	height: 18px !important;
+	width: 18px !important;
+	border-radius: 50% !important;
+	border: 3px solid #ffffff !important;
+	filter: drop-shadow(0 0 4px rgba(255,255,255,.85));
+	z-index: 20 !important;
+	animation: piecePulse 1.4s ease-in-out infinite;
+}
+
+@keyframes piecePulse {
+	0%, 100% { transform: scale(1); }
+	50% { transform: scale(1.12); }
+}
+
+/* 当前行动的玩家棋子：更强的高亮 */
+.cell-position.active-piece {
+	animation: piecePulse 0.8s ease-in-out infinite;
+	filter: drop-shadow(0 0 8px #ffd860) brightness(1.15);
+	border-color: #ffe89a !important;
+}
+
+/* 当前玩家格子高亮 */
+.cell-current {
+	outline: 2px solid #ffd860 !important;
+	outline-offset: -2px;
+}
+
+
+/* ============================================================
+ * 2026-10-17 玩家列表遮挡修复
+ * 右上角 moneybar 改成顶部横排，不再压住棋盘
+ * ============================================================ */
+#moneybarwrap {
+	position: static !important;
+	width: 100% !important;
+	min-width: 0 !important;
+	right: auto !important;
+	top: auto !important;
+}
+
+#moneybar {
+	float: none !important;
+	display: block;
+	margin: 6px auto 8px !important;
+	padding: 6px 8px !important;
+	background: linear-gradient(180deg, #101e2c, #0a1420) !important;
+	border: 1px solid #2e4a63 !important;
+	border-radius: 12px !important;
+	max-width: 640px;
+	box-sizing: border-box;
+}
+
+#moneybar table {
+	width: 100% !important;
+	border-spacing: 4px !important;
+}
+
+/* 表格行改横向排列 */
+#moneybar table,
+#moneybar tbody {
+	display: block !important;
+}
+
+#moneybar tr.money-bar-row {
+	display: inline-block !important;
+	vertical-align: top;
+	width: calc(25% - 6px);
+	box-sizing: border-box;
+}
+
+#moneybar tr#moneybarrowbutton {
+	display: block !important;
+	width: 100% !important;
+	text-align: center;
+	margin-top: 4px;
+}
+
+#moneybar td {
+	border: none !important;
+	padding: 0 !important;
+}
+
+.moneybararrowcell {
+	display: none !important;
+}
+
+.moneybarcell {
+	background: #0a1420;
+	border: 1px solid #24384c !important;
+	border-radius: 8px;
+	padding: 4px 2px !important;
+	font-size: 10px;
+	line-height: 1.35;
+	color: #9fe0ff;
+}
+
+.moneybarcell > div:first-child {
+	font-size: 9px;
+	color: #6a8fb0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.moneybarcell > div:last-child {
+	font-size: 11px;
+	font-weight: 700;
+	color: #ffd860;
+}
+
+/* 小屏进一步压缩 */
+@media (max-width: 430px) {
+	#moneybar { margin: 4px auto 6px !important; padding: 5px 6px !important; }
+	#moneybar tr.money-bar-row { width: calc(33.33% - 5px); }
+	.moneybarcell { font-size: 9px; padding: 3px 1px !important; }
+	.moneybarcell > div:last-child { font-size: 10px; }
+}
+
+/* ============================================================
+   2026-10-18 v8：交易窗深色（与其他弹窗统一）
+   ============================================================ */
+#trade {
+	background: #0e1a26 !important;
+	border: 1px solid #2e4a63 !important;
+	border-radius: 12px !important;
+	box-shadow: 0 10px 40px rgba(0,0,0,.6);
+	color: #dbeafe !important;
+	padding: 8px !important;
+	max-width: calc(100vw - 20px) !important;
+	box-sizing: border-box;
+}
+#trade table { width: 100%; table-layout: fixed; }
+#trade .trade-cell { width: auto !important; height: auto !important; padding: 5px 6px !important; color: #dbeafe !important; }
+#trade-leftp-name, #trade-rightp-name { color: #9fe0ff !important; font-size: 13px; line-height: 1.5; word-break: break-all; }
+#trade-leftp-money, #trade-rightp-money {
+	background: #060d16 !important; border: 1px solid #2e4a63 !important;
+	border-radius: 7px; color: #dbeafe !important; height: 30px;
+	padding: 0 6px; font-family: inherit; font-size: 13px; width: 88% !important;
+	box-sizing: border-box;
+}
+#trade-leftp-money:focus, #trade-rightp-money:focus {
+	border-color: #5aa8e0 !important; outline: none;
+	box-shadow: 0 0 0 2px rgba(90,168,224,.18);
+}
+#trade .trade-cell label { color: #a8c4dc !important; font-size: 12px; display: inline-block; padding: 2px 0; }
+#trade .trade-cell input[type=checkbox] { accent-color: #38a0e0; width: 15px; height: 15px; vertical-align: middle; margin-right: 4px; }
+#trade .trade-cell img { max-width: 22px; max-height: 22px; vertical-align: middle; margin-right: 3px; }
+#trade input[type=button] {
+	background: linear-gradient(160deg, #1c3448, #12222f) !important;
+	border: 1px solid #2e4a63 !important;
+	color: #dbeafe !important;
+	border-radius: 8px; padding: 9px 12px; margin: 3px; font-size: 12.5px;
+	font-weight: 600; font-family: inherit; cursor: pointer;
+}
+#trade input[type=button]:active { transform: scale(.98); }
+#trade #proposetradebutton, #trade #accepttradebutton {
+	background: linear-gradient(160deg, #2e8ec9, #1b5a90) !important;
+	border-color: #5aa8e0 !important;
+}
+@media (max-width: 430px) {
+	#trade { width: auto !important; margin: 8px auto !important; }
+	#trade input[type=button] { padding: 10px 8px; font-size: 12px; }
+}
+
+/* ============================================================
+   2026-10-18 v10：星宿卡上移，避开底部资金栏
+   ============================================================ */
+#popupwrap {
+	top: 42% !important;
+	left: 0 !important;
+	transform: translateY(-50%) !important;
+	position: fixed !important;
+}
+@media (max-height: 700px) {
+	#popupwrap { top: 38% !important; }
+}
+
+/* ============================================================
+   2026-10-18 v11：管理窗 / 买地提示改暗色（补漏）
+   ============================================================ */
+#manage {
+	background: #0e1a26 !important;
+	border: 1px solid #2e4a63 !important;
+	border-radius: 10px;
+	color: #dbeafe !important;
+}
+#option {
+	background: #0b1420 !important;
+	border-bottom: 1px solid #2e4a63 !important;
+	padding: 5px 4px !important;
+}
+#owned {
+	background: #0e1a26 !important;
+	color: #dbeafe !important;
+	padding: 5px 3px !important;
+}
+#buy {
+	background: #0e1a26 !important;
+	border: 1px solid #2e4a63 !important;
+	border-radius: 10px;
+	color: #dbeafe !important;
+}
+#owned .propertycellname,
+#owned .propertycellname a,
+#owned td,
+#owned td a {
+	color: #dbeafe !important;
+}
+#owned .propertycellname a { text-decoration: none; }
+#owned .propertycellname a:hover { color: #9fe0ff !important; }
+#owned input[type=button],
+#option input[type=button] {
+	background: linear-gradient(160deg, #1c3448, #12222f) !important;
+	border: 1px solid #2e4a63 !important;
+	color: #dbeafe !important;
+	border-radius: 7px;
+	padding: 6px 10px;
+	font-size: 12px;
+	font-family: inherit;
+}
+#owned input[type=button]:active,
+#option input[type=button]:active { transform: scale(.98); }
+#buildings { color: #9fe0ff !important; }
+#owned::-webkit-scrollbar { width: 6px; }
+#owned::-webkit-scrollbar-thumb { background: #2e4a63; border-radius: 3px; }
+#owned::-webkit-scrollbar-track { background: #0b1420; }
+
+/* ============================================================
+   2026-10-18 v13：地标详情卡（deed）+ 放大卡（enlarge）改暗
+   ============================================================ */
+#deed {
+	background: #0e1a26 !important;
+	border: 1px solid #2e4a63 !important;
+	border-radius: 12px !important;
+	box-shadow: 0 10px 32px rgba(0,0,0,.65);
+	color: #dbeafe !important;
+	overflow: hidden;
+}
+#deed td, #deed div { color: #dbeafe !important; }
+#deed-header {
+	background: #1a3a52 !important;
+	border: 1px solid #2e4a63 !important;
+	color: #9fe0ff !important;
+	border-radius: 8px;
+}
+#deed-name, #deed-mortgaged, #deed-mortgaged-name,
+#deed-special, #deed-special-name, #deed-special-text, #deed-special-footer {
+	color: #dbeafe !important;
+}
+#deed-table { color: #cfe4f5 !important; }
+#deed-table td { border-bottom: 1px dotted #2e4a63 !important; }
+.enlarge {
+	background: #0e1a26 !important;
+	border: 1px solid #2e4a63 !important;
+	border-radius: 10px;
+	color: #dbeafe !important;
+	box-shadow: 0 8px 28px rgba(0,0,0,.65);
+	overflow: hidden;
+}
+.enlarge-name {
+	background: #13263a !important;
+	color: #9fe0ff !important;
+	border-radius: 6px;
+}
+.enlarge-price, .enlarge-color { background: transparent !important; color: #dbeafe !important; }
+#enlarge40name, #enlarge38name, #enlarge40price { color: #9fe0ff !important; }
+
+/* ============================================================
+   2026-10-18 v3：古风典雅（水墨 · 宣纸 · 淡雅）
+   配色：墨黑 #1a1410 / 宣纸 #e8dcc0 / 朱砂 #a83232 / 竹青 #4a6b52
+   ============================================================ */
+:root {
+	--ink:#1a1410; --ink2:#241c16; --paper:#e8dcc0; --paper2:#d8caa8;
+	--cinnabar:#a83232; --bamboo:#4a6b52; --gold:#c9a961; --mist:#8a9aa8;
+}
+
+body {
+	background: linear-gradient(170deg, #14100c 0%, #1c1712 45%, #0d0a08 100%) !important;
+	color: #ddd2b8 !important;
+}
+
+/* 设置页 */
+#setup {
+	background: linear-gradient(180deg, #1e1913 0%, #14100c 100%) !important;
+	border: 1px solid #4a3f30 !important;
+	box-shadow: 0 10px 40px rgba(0,0,0,.7), inset 0 0 60px rgba(200,180,120,.04);
+}
+#setup::before {
+	background: linear-gradient(90deg, #c9a961, #e8dcc0, #c9a961) !important;
+	-webkit-background-clip: text !important;
+	background-clip: text !important;
+	-webkit-text-fill-color: transparent !important;
+	letter-spacing: 6px !important;
+}
+#setup::after { color: #7a6a52 !important; }
+
+.player-input {
+	background: linear-gradient(180deg, #241c16, #1a1410) !important;
+	border: 1px solid #4a3f30 !important;
+}
+.player-input input[type=text], .player-input select {
+	background: #12100c !important;
+	border: 1px solid #4a3f30 !important;
+	color: #ddd2b8 !important;
+}
+#playernumber { background: #12100c !important; border-color: #4a3f30 !important; color: #c9a961 !important; }
+#setup input[value="开始游戏"] {
+	background: linear-gradient(160deg, #a83232, #6e1f1f) !important;
+	border: 1px solid #c9a961 !important;
+	color: #f0e6cc !important;
+	letter-spacing: 4px !important;
+	box-shadow: 0 4px 18px rgba(168,50,50,.35), inset 0 1px 0 rgba(255,220,150,.15) !important;
+}
+
+/* 主面板 / 控制区 */
+#control, #alert, #deed, #moneybar, #quickstats, #landed {
+	background: linear-gradient(180deg, #1e1913, #14100c) !important;
+	border: 1px solid #4a3f30 !important;
+	color: #ddd2b8 !important;
+	box-shadow: 0 4px 16px rgba(0,0,0,.5);
+}
+#alert { color: #cbbf9f !important; }
+#landed { color: #cbbf9f !important; border-color: #4a3f30 !important; }
+#pname { background: #12100c !important; color: #c9a961 !important; border: 1px solid #4a3f30 !important; }
+
+/* 按钮 */
+input[type=button], button {
+	background: linear-gradient(160deg, #2a2219, #1a1410) !important;
+	border: 1px solid #5a4f3a !important;
+	color: #ddd2b8 !important;
+}
+input[type=button]:hover, button:hover { filter: brightness(1.2); }
+#nextbutton, #proposetradebutton, #accepttradebutton {
+	background: linear-gradient(160deg, #a83232, #6e1f1f) !important;
+	border-color: #c9a961 !important;
+	color: #f0e6cc !important;
+}
+
+/* 菜单条 */
+.menu-item a { color: #ddd2b8 !important; }
+#menu { background: linear-gradient(180deg, #2a2219, #1a1410) !important; border: 1px solid #4a3f30 !important; }
+.menu-item { border-right: 1px solid #4a3f30 !important; }
+.menu-item:hover { background: #332a1e !important; }
+
+/* 弹窗（普通） */
+#popup, #stats {
+	background: linear-gradient(180deg, #1e1913, #14100c) !important;
+	border: 1px solid #5a4a34 !important;
+	color: #ddd2b8 !important;
+}
+#popupbackground, #statsbackground { background: rgba(10,8,6,.82) !important; }
+
+/* 交易窗 */
+#trade {
+	background: linear-gradient(180deg, #1e1913, #14100c) !important;
+	border: 1px solid #5a4a34 !important;
+	color: #ddd2b8 !important;
+}
+#trade-leftp-name, #trade-rightp-name { color: #c9a961 !important; }
+#trade-leftp-money, #trade-rightp-money {
+	background: #12100c !important; border-color: #4a3f30 !important; color: #ddd2b8 !important;
+}
+#trade input[type=button] {
+	background: linear-gradient(160deg, #2a2219, #1a1410) !important;
+	border-color: #5a4f3a !important; color: #ddd2b8 !important;
+}
+#trade #proposetradebutton, #trade #accepttradebutton {
+	background: linear-gradient(160deg, #a83232, #6e1f1f) !important; border-color: #c9a961 !important;
+}
+
+/* 管理 / 地产列表 */
+#manage, #owned, #buy, #option {
+	background: linear-gradient(180deg, #1e1913, #14100c) !important;
+	border-color: #4a3f30 !important; color: #ddd2b8 !important;
+}
+#owned td, #owned td a, #owned .propertycellname a { color: #ddd2b8 !important; }
+#owned::-webkit-scrollbar-thumb { background: #4a3f30; }
+#owned::-webkit-scrollbar-track { background: #14100c; }
+#buildings { color: #c9a961 !important; }
+
+/* 地标详情 */
+#deed-header {
+	background: linear-gradient(160deg, #a83232, #6e1f1f) !important;
+	border: 1px solid #c9a961 !important;
+	color: #f0e6cc !important;
+}
+#deed td, #deed div, #deed-name, #deed-special, #deed-special-text, #deed-mortgaged { color: #ddd2b8 !important; }
+.enlarge { background: linear-gradient(180deg, #1e1913, #14100c) !important; border-color: #5a4a34 !important; color: #ddd2b8 !important; }
+.enlarge-name { background: #241c16 !important; color: #c9a961 !important; }
+.enlarge-price, .enlarge-color { background: transparent !important; color: #ddd2b8 !important; }
+
+/* 棋子：墨点带金边 */
+.cell-position { border-color: #f0e6cc !important; filter: drop-shadow(0 0 4px rgba(201,169,97,.9)) !important; }
+
+/* 星宿弹窗：古风 */
+#popup.star-popup {
+	background: linear-gradient(160deg, #241c16 0%, #12100c 100%) !important;
+	border: 1px solid #8a7040 !important;
+	box-shadow: 0 0 40px rgba(201,169,97,.2), 0 8px 32px rgba(0,0,0,.8) !important;
+	color: #e8dcc0 !important;
+}
+#popup.star-popup.di {
+	background: linear-gradient(160deg, #2a1414 0%, #120a0a 100%) !important;
+	border-color: #8a3434 !important;
+}
+#popup .star-btn {
+	background: linear-gradient(160deg, #c9a961, #8a6f30) !important;
+	color: #1a1410 !important;
+	letter-spacing: 4px !important;
+}
+#popup.di .star-btn { background: linear-gradient(160deg, #a83232, #6e1f1f) !important; color: #f0e6cc !important; }
+
+/* 顶部资金栏 */
+#moneybar td { color: #ddd2b8 !important; }
+.moneybarcell { border-color: #4a3f30 !important; }

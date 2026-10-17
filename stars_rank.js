@@ -1,0 +1,181 @@
+/* ============================================================
+ * stars_rank.js — 神明卡升星 + 白饭核弹终局
+ * 2026-10-18
+ * 规则：
+ *   同名 3 张 → 二星；共 9 张 → 三星
+ *   星级越高，效果越强（一星 ×1 / 二星 ×2 / 三星 ×4）
+ *   集齐 5 张三星 → 白饭核弹，立即第一名，结束本局
+ * ============================================================ */
+(function(){
+  'use strict';
+
+  var STAR_UP = { 1:1, 2:2, 3:4, 4:10 };    // 星级倍率
+  var NEED_2 = 3, NEED_3 = 9, NEED_4 = 27;   // 升星张数（3→9→27）
+  var WIN_3STAR = 5;                          // 五张三星触发
+  var decks = {};                             // decks[玩家序号][卡名] = 累计抽到张数
+  var GAME_LOCKED = false;                    // 白饭核弹触发后锁死一切
+
+  function deckOf(p){
+    var i = player.indexOf(p);
+    if(i < 1) i = 0;
+    if(!decks[i]) decks[i] = {};
+    return decks[i];
+  }
+
+  function starOf(count){
+    if(count >= NEED_4) return 4;
+    if(count >= NEED_3) return 3;
+    if(count >= NEED_2) return 2;
+    return 1;
+  }
+
+  function threeStarCount(p){
+    var d = deckOf(p), n = 0;
+    for(var k in d){ if(d[k] >= NEED_3) n++; }
+    return n;
+  }
+
+  /* 抽到一张神明卡：累计 → 算星级 → 按星级放大效果 */
+  function drawAndApply(p, card, kind){
+    var d = deckOf(p);
+    var name = card.name;
+    d[name] = (d[name] || 0) + 1;
+    var cnt = d[name];
+    var star = starOf(cnt);
+    var mult = STAR_UP[star];
+
+    // 效果按星级放大：把 fn 里的金额放大，通过临时乘数实现
+    window.__STAR_MULT = mult;
+    try { card.fn(p); } catch(e){ console.warn('[升星]', e); }
+    window.__STAR_MULT = 1;
+
+    updateMoney(); updateOwned(); updatePosition();
+
+    var wentThree = (cnt === NEED_3);
+    var wentFour  = (cnt === NEED_4);
+    showStarUp(card, star, cnt, p, function(){
+      // 彩蛋：任意一张卡合出「四星」→ 直接白饭核弹
+      if(wentFour){
+        riceRocket(p, '四星彩蛋');
+        return;
+      }
+      // 常规：升到三星且集齐五张三星 → 核弹
+      if(wentThree && threeStarCount(p) >= WIN_3STAR){
+        riceRocket(p, '五张三星');
+      }
+    });
+  }
+
+  /* 升星弹窗 */
+  function showStarUp(card, star, cnt, p, after){
+    var stars = '';
+    var maxStar = 4;
+    for(var i=0;i<maxStar;i++){ stars += (i < star ? '★' : '☆'); }
+    var accent = star>=4 ? '#ff5a8a' : (star===3 ? '#ffd86a' : (star===2 ? '#c9a961' : '#9fe0ff'));
+
+    var html =
+      '<div style="padding:18px 18px 12px;text-align:center">' +
+        '<div style="font-size:11px;letter-spacing:4px;color:'+accent+';opacity:.8;margin-bottom:10px">'+((kind==='war')?'武将降临':(kind==='mech'?'机制降临':'神明降临'))+'</div>' +
+        '<div style="font-size:32px;line-height:1;margin-bottom:6px">'+card.icon+'</div>' +
+        '<div style="font-size:24px;font-weight:900;color:'+accent+';letter-spacing:3px;text-shadow:0 0 18px '+accent+'66">'+card.name+'</div>' +
+        '<div style="font-size:20px;color:'+accent+';letter-spacing:6px;margin:8px 0">'+stars+(star>=4?' <span style="font-size:11px;letter-spacing:1px">四星·彩蛋</span>':'')+'</div>' +
+        '<div style="font-size:11px;color:#8a7040;margin-bottom:10px">已收集 '+cnt+' 张 · 效果 ×'+STAR_UP[star]+'</div>' +
+        '<div style="height:1px;background:linear-gradient(90deg,transparent,'+accent+'66,transparent);margin:10px 0 12px"></div>' +
+        '<div style="font-size:13.5px;color:#e8dcc8;line-height:1.8;padding:0 2px">'+card.text+'</div>' +
+        '<div style="margin-top:12px;font-size:10px;color:#5a4a3a">'+p.name+' · 三星 '+threeStarCount(p)+' / '+WIN_3STAR+'</div>' +
+      '</div>' +
+      '<button class="star-btn" id="cncardbtn" style="background:linear-gradient(160deg,'+accent+',#8a6f30);color:#1a1208">收 下</button>';
+
+    var P=document.getElementById('popup'), txt=document.getElementById('popuptext');
+    txt.innerHTML = html;
+    P.className='star-popup';
+    P.style.width='300px'; P.style.minWidth='300px'; P.style.padding='0';
+    P.style.background='linear-gradient(160deg,#241c16 0%,#12100c 100%)';
+    P.style.borderColor='#8a7040';
+
+    var wrap=document.getElementById('popupwrap'), bgel=document.getElementById('popupbackground');
+    if(bgel) bgel.style.display='block';
+    wrap.style.display='block';
+
+    var btn=document.getElementById('cncardbtn');
+    function done(){
+      if(bgel) bgel.style.display='none';
+      wrap.style.display='none';
+      P.className=''; P.style.background=''; P.style.borderColor='';
+      if(after) after();
+    }
+    btn.addEventListener('click', done);
+    btn.addEventListener('touchend', function(e){ e.preventDefault(); done(); });
+  }
+
+  /* 白饭核弹：终局 */
+  function riceRocket(winner, reason){
+    // 2026-10-18 老爹定：触发者绝对第一，优先级高于一切代码
+    // 哪怕触发那一刻他刚好破产、被淘汰、资产为负，也强制获胜
+    GAME_LOCKED = true;
+    window.__RICE_WINNER = winner;
+
+    var ranking = [];
+    for(var i=1;i<=pcount;i++){
+      var pl=player[i]; if(!pl) continue;
+      var val=0;
+      for(var k=0;k<square.length;k++){
+        var sq=square[k];
+        if(sq.owner===i && sq.price>0){
+          val += sq.price + sq.house * (sq.houseprice||0) + (sq.hotel ? (sq.houseprice||0) : 0);
+        }
+      }
+      var isWin = (pl === winner) || (pl.index === winner.index);
+      ranking.push({ name: pl.name, money: pl.money, prop: val, total: isWin ? Number.MAX_SAFE_INTEGER : (pl.money + val), isWin: isWin });
+    }
+    ranking.sort(function(a,b){
+      if(a.isWin) return -1;
+      if(b.isWin) return 1;
+      return b.total - a.total;
+    });
+
+    var rows='';
+    for(var r=0;r<ranking.length;r++){
+      var x=ranking[r];
+      rows += '<div style="display:flex;justify-content:space-between;padding:7px 4px;border-bottom:1px dashed #4a3f30;font-size:13px">' +
+        '<span style="color:'+(x.isWin?'#ffd86a':'#ddd2b8')+';font-weight:'+(x.isWin?'900':'400')+'">' +
+        (r+1)+'. '+(x.isWin?'👑 ':'')+x.name+'</span>' +
+        '<span style="color:#c9a961">'+(window.fmtMoney?fmtMoney(x.total):x.total)+'</span>' +
+      '</div>';
+    }
+
+    var html =
+      '<div style="padding:20px 16px 14px;text-align:center">' +
+        '<div style="font-size:52px;line-height:1;margin-bottom:10px">🍚💥</div>' +
+        '<div style="font-size:22px;font-weight:900;color:#ffd86a;letter-spacing:4px;text-shadow:0 0 24px #ffd86a88">白饭核弹</div>' +
+        '<div style="font-size:12px;color:#8a7040;margin:8px 0 16px;letter-spacing:2px">'+(reason||'五张三星')+' · 天命所归</div>' +
+        '<div style="font-size:15px;color:#e8dcc8;margin-bottom:14px"><b style="color:#ffd86a">'+winner.name+'</b> '+(reason==='四星彩蛋'?'合出四星彩蛋，直接夺冠':'集齐五张三星，直接夺冠')+'</div>' +
+        '<div style="background:#12100c;border:1px solid #4a3f30;border-radius:10px;padding:8px 12px;text-align:left">'+rows+'</div>' +
+        '<div style="font-size:11px;color:#5a4a3a;margin-top:12px">其余名次按「现金 + 房产估值」排序</div>' +
+      '</div>' +
+      '<button class="star-btn" style="background:linear-gradient(160deg,#ffd86a,#8a6f30);color:#1a1208" onclick="location.reload()">结 束 本 局</button>';
+
+    var P=document.getElementById('popup'), txt=document.getElementById('popuptext');
+    txt.innerHTML = html;
+    P.className='star-popup';
+    P.style.width='320px'; P.style.minWidth='320px'; P.style.padding='0';
+    P.style.background='linear-gradient(160deg,#2a1408 0%,#0d0704 100%)';
+    P.style.borderColor='#c9a961';
+
+    var wrap=document.getElementById('popupwrap'), bgel=document.getElementById('popupbackground');
+    if(bgel) bgel.style.display='block';
+    wrap.style.display='block';
+  }
+
+  /* 导出 */
+  window.CNStars = {
+    isLocked: function(){ return GAME_LOCKED; },
+    unlock: function(){ GAME_LOCKED = false; window.__RICE_WINNER = null; },
+    drawAndApply: drawAndApply,
+    starOf: starOf,
+    threeStarCount: threeStarCount,
+    deckOf: deckOf,
+    STAR_UP: STAR_UP,
+    NEED_4: NEED_4
+  };
+})();
