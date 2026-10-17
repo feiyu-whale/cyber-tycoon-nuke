@@ -1117,7 +1117,7 @@ function Player(name, color) {
 	this.name = name;
 	this.color = color;
 	this.position = 0;
-	this.money = 5000;
+	this.money = 10000;
 	this.coins = 5;          // 2026-10-18 金币：1 金币 = 10000 现金
 	this.shopLevel = 1;      // 商店等级（每局重置）
 	this.creditor = -1;
