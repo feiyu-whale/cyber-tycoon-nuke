@@ -1,10 +1,10 @@
 /* ============================================================
- * stars_rank.js — 神明卡升星 + 核弹终局
+ * stars_rank.js — 神明卡升星 + 白饭核弹终局
  * 2026-10-18
  * 规则：
  *   同名 3 张 → 二星；共 9 张 → 三星
  *   星级越高，效果越强（一星 ×1 / 二星 ×2 / 三星 ×4）
- *   集齐 5 张三星 → 核弹，立即第一名，结束本局
+ *   集齐 5 张三星 → 白饭核弹，立即第一名，结束本局
  * ============================================================ */
 (function(){
   'use strict';
@@ -13,7 +13,7 @@
   var NEED_2 = 3, NEED_3 = 9, NEED_4 = 27;   // 升星张数（3→9→27）
   var WIN_3STAR = 5;                          // 五张三星触发
   var decks = {};                             // decks[玩家序号][卡名] = 累计抽到张数
-  var GAME_LOCKED = false;                    // 核弹触发后锁死一切
+  var GAME_LOCKED = false;                    // 白饭核弹触发后锁死一切
 
   function deckOf(p){
     var i = player.indexOf(p);
@@ -63,11 +63,11 @@
       if(wentThree && threeStarCount(p) >= WIN_3STAR){
         riceRocket(p, '五张三星');
       }
-    });
+    }, kind);
   }
 
   /* 升星弹窗 */
-  function showStarUp(card, star, cnt, p, after){
+  function showStarUp(card, star, cnt, p, after, kind){
     var stars = '';
     var maxStar = 4;
     for(var i=0;i<maxStar;i++){ stars += (i < star ? '★' : '☆'); }
@@ -108,7 +108,7 @@
     btn.addEventListener('touchend', function(e){ e.preventDefault(); done(); });
   }
 
-  /* 核弹：终局 */
+  /* 白饭核弹：终局 */
   function riceRocket(winner, reason){
     // 2026-10-18 老爹定：触发者绝对第一，优先级高于一切代码
     // 哪怕触发那一刻他刚好破产、被淘汰、资产为负，也强制获胜
@@ -147,7 +147,7 @@
     var html =
       '<div style="padding:20px 16px 14px;text-align:center">' +
         '<div style="font-size:52px;line-height:1;margin-bottom:10px">🍚💥</div>' +
-        '<div style="font-size:22px;font-weight:900;color:#ffd86a;letter-spacing:4px;text-shadow:0 0 24px #ffd86a88">核弹</div>' +
+        '<div style="font-size:22px;font-weight:900;color:#ffd86a;letter-spacing:4px;text-shadow:0 0 24px #ffd86a88">白饭核弹</div>' +
         '<div style="font-size:12px;color:#8a7040;margin:8px 0 16px;letter-spacing:2px">'+(reason||'五张三星')+' · 天命所归</div>' +
         '<div style="font-size:15px;color:#e8dcc8;margin-bottom:14px"><b style="color:#ffd86a">'+winner.name+'</b> '+(reason==='四星彩蛋'?'合出四星彩蛋，直接夺冠':'集齐五张三星，直接夺冠')+'</div>' +
         '<div style="background:#12100c;border:1px solid #4a3f30;border-radius:10px;padding:8px 12px;text-align:left">'+rows+'</div>' +

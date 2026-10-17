@@ -99,13 +99,18 @@
   }
   function allOpponents(p,fn){ var o=opponents(p); for(var i=0;i<o.length;i++) fn(o[i]); }
   function stealProperty(p){
+    // 2026-10-18 放宽：盖了房/旅馆的地也能夺（连建筑一起抢过来）
     var me=player.indexOf(p), cand=[];
     for(var i=0;i<square.length;i++){
       var s=square[i];
-      if(s.owner>0 && s.owner!==me && s.price>0 && s.house===0 && !s.hotel) cand.push(s);
+      if(s.owner>0 && s.owner!==me && s.price>0) cand.push(s);
     }
     if(!cand.length){ gain(p,8000); return; }
-    var t=cand[rnd(cand.length)]; t.owner=me; addAlert('【随机】'+p.name+' 抽中 '+t.name+'，夺取了该对手的 '+t.name+'。');
+    var t=cand[rnd(cand.length)];
+    var ownerName = player[t.owner] ? player[t.owner].name : '某对手';
+    var extra = (t.hotel ? '（含旅馆）' : (t.house>0 ? '（含 '+t.house+' 栋房）' : ''));
+    t.owner = me;
+    addAlert('【随机】'+p.name+' 抽中 '+ownerName+'，夺取了该对手的 '+t.name+extra+'。');
   }
   function takeFromOne(p,v){
     var o=opponents(p); if(!o.length){ gain(p,5000); return; }
@@ -119,10 +124,32 @@
     t.money-=amt; p.money+=amt; addAlert('【随机】'+p.name+' 抽中 '+t.name+'，夺走该对手 $'+amt+'。');
   }
   function demolishOne(p){
-    var me=player.indexOf(p), cand=[];
-    for(var i=0;i<square.length;i++){ var s=square[i]; if(s.owner>0&&s.owner!==me&&(s.house>0||s.hotel)) cand.push(s); }
-    if(!cand.length){ gain(p,600); return; }
-    var t=cand[rnd(cand.length)]; t.house=0; t.hotel=0; addAlert('【随机】'+p.name+' 抽中 '+t.name+'，拆掉了 '+t.name+' 上的建筑。');
+    // 2026-10-18 放宽：优先拆有建筑的地；无建筑时改为打劫现金
+    var me=player.indexOf(p), cand=[], anyProp=[];
+    for(var i=0;i<square.length;i++){
+      var s=square[i];
+      if(s.owner>0 && s.owner!==me){
+        if(s.house>0 || s.hotel) cand.push(s);
+        if(s.price>0) anyProp.push(s);
+      }
+    }
+    if(cand.length){
+      var t=cand[rnd(cand.length)];
+      var ownerName = player[t.owner] ? player[t.owner].name : '某对手';
+      var what = t.hotel ? '旅馆' : (t.house+' 栋房子');
+      t.house=0; t.hotel=0;
+      updateOwned();
+      addAlert('【随机】'+p.name+' 抽中 '+ownerName+'，拆掉了 '+t.name+' 上的 '+what+'。');
+      return;
+    }
+    if(anyProp.length){
+      var t2 = anyProp[rnd(anyProp.length)];
+      var ownerName2 = player[t2.owner] ? player[t2.owner].name : '某对手';
+      addAlert('【随机】'+p.name+' 抽中 '+ownerName2+' 的 '+t2.name+'，但上头没建筑可拆，改为索取补偿。');
+      gain(p, 6000);
+      return;
+    }
+    gain(p,6000);
   }
   function move(p,n){ p.position=(p.position+n)%40; updatePosition(); addAlert(p.name+' 前进 '+n+' 格。'); }
   function jailOne(p){
@@ -262,7 +289,7 @@
     if(kind!=='mech' || card.name!=='复制'){ lastCard = card; }
 
     // 2026-10-18：所有卡（神明/武将/机制）都走升星流程
-    // 星级越高效果越强，集齐五张三星 → 核弹
+    // 星级越高效果越强，集齐五张三星 → 白饭核弹
     if(window.CNStars){
       window.CNStars.drawAndApply(p, card, kind);
       if(after) after();
