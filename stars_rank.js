@@ -310,7 +310,7 @@
         '<div style="font-size:52px;line-height:1;margin-bottom:10px">'+(reason==='资产封顶'?'💰🏛️':'🍚💥')+'</div>' +
         '<div style="font-size:22px;font-weight:900;color:#ffd86a;letter-spacing:4px;text-shadow:0 0 24px #ffd86a88">'+(reason==='资产封顶'?'大而不能倒':'白饭核弹')+'</div>' +
         '<div style="font-size:12px;color:#8a7040;margin:8px 0 16px;letter-spacing:2px">'+(reason==='资产封顶'?'成就达成 · 本局终结':(reason||'五张三星')+' · 天命所归')+'</div>' +
-        '<div style="font-size:15px;color:#e8dcc8;margin-bottom:6px"><b style="color:#ffd86a">'+winner.name+'</b> '+(reason==='资产封顶'?'的资产突破 $1000万亿，已大到不能倒——本局到此结束':'')+'</div>' +
+        '<div style="font-size:15px;color:#e8dcc8;margin-bottom:6px"><b style="color:#ffd86a">'+winner.name+'</b> '+(reason==='资产封顶'?'的资产突破 $1000兆（1,000,000,000,000,000），已大到不能倒——本局到此结束':'')+'</div>' +
         (reason==='资产封顶'?'<div style="font-size:11.5px;color:#9a8f78;line-height:1.6;margin-bottom:14px">体量大到足以左右全局，无人能撼动其地位。<br>「大而不能倒」——一旦达成，牌局再无悬念。</div>':(reason==='四星彩蛋'?'<div style="font-size:14px;color:#e8dcc8;margin-bottom:14px">合出四星彩蛋，直接夺冠</div>':'<div style="font-size:14px;color:#e8dcc8;margin-bottom:14px">集齐五张三星，直接夺冠</div>')) +
         '<div style="background:#12100c;border:1px solid #4a3f30;border-radius:10px;padding:8px 12px;text-align:left">'+rows+'</div>' +
         '<div style="font-size:11px;color:#5a4a3a;margin-top:12px">其余名次按「现金 + 房产估值」排序</div>' +

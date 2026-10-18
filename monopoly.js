@@ -1370,16 +1370,38 @@ function updatePosition() {
 	// }
 }
 
-/* 2026-10-18 中国版：大数格式化（万/亿/万亿） */
+/* 2026-10-18 中国版：大数格式化（正统古单位·万进制「上数」）
+   万→亿→兆→京→垓→秭→穰→沟→涧→正→载，每级 ×1万
+   载之上没有正统中文单位了 → 改用科学计数法 */
+var CN_BIG_UNITS = [
+	{ v: 1e4,  n: '万' },
+	{ v: 1e8,  n: '亿' },
+	{ v: 1e12, n: '兆' },
+	{ v: 1e16, n: '京' },
+	{ v: 1e20, n: '垓' },
+	{ v: 1e24, n: '秭' },
+	{ v: 1e28, n: '穰' },
+	{ v: 1e32, n: '沟' },
+	{ v: 1e36, n: '涧' },
+	{ v: 1e40, n: '正' },
+	{ v: 1e44, n: '载' }
+];
 function fmtMoney(n) {
 	n = Number(n) || 0;
 	var neg = n < 0;
 	var a = Math.abs(n);
 	var out;
-	if (a >= 1e12)      out = (a / 1e12).toFixed(2).replace(/\.?0+$/, '') + '万亿';
-	else if (a >= 1e8)  out = (a / 1e8).toFixed(2).replace(/\.?0+$/, '') + '亿';
-	else if (a >= 1e4)  out = (a / 1e4).toFixed(2).replace(/\.?0+$/, '') + '万';
-	else                out = String(Math.round(a));
+	if (a >= 1e48) {
+		// 超过「载」→ 科学计数法
+		out = a.toExponential(2).replace('e+', '×10^');
+	} else {
+		var hit = null;
+		for (var i = CN_BIG_UNITS.length - 1; i >= 0; i--) {
+			if (a >= CN_BIG_UNITS[i].v) { hit = CN_BIG_UNITS[i]; break; }
+		}
+		if (hit) out = (a / hit.v).toFixed(2).replace(/\.?0+$/, '') + hit.n;
+		else out = String(Math.round(a));
+	}
 	return (neg ? '-' : '') + '$' + out;
 }
 window.fmtMoney = fmtMoney;
