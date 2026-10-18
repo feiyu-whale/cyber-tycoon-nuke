@@ -69,6 +69,11 @@
     } catch(e){ console.warn('[升星]', e); }
     window.__STAR_MULT = 1;
 
+    // 2026-10-18：宝光流转（赐福）——百分比扣钱类卡有 30% 概率暴击，效果再翻倍
+    if(window.Boon && window.Boon.onPercentCard && card && card.text && card.text.indexOf('%') >= 0){
+      window.Boon.onPercentCard(p, card);
+    }
+
     // 2026-10-18：三星额外触发专属技能（原效果 ×10 之后再叠加）
     if(cnt === NEED_3){
       // 武将/神明：卡自带 star3fn
@@ -163,8 +168,12 @@
         '<div style="font-size:20px;color:'+accent+';letter-spacing:6px;margin:8px 0">'+stars+(star>=4?' <span style="font-size:11px;letter-spacing:1px">四星·彩蛋</span>':'')+'</div>' +
         '<div style="font-size:11px;color:#8a7040;margin-bottom:10px">已收集 '+cnt+' 张 · 效果 ×'+STAR_UP[star]+'</div>' +
         '<div style="height:1px;background:linear-gradient(90deg,transparent,'+accent+'66,transparent);margin:10px 0 12px"></div>' +
-        '<div style="font-size:13.5px;color:#e8dcc8;line-height:1.8;padding:0 2px">'+card.text+'</div>' +
-        (star>=3 && card.star3 ? '<div style="margin-top:10px;padding:8px;background:#2a1a08;border:1px solid #8a6f30;border-radius:8px;font-size:12px;color:#ffd86a;line-height:1.7">'+card.star3+'</div>' : '') +
+        '<div style="text-align:left;font-size:12px;line-height:1.75;color:#cfc3ae;padding:0 2px">' +
+          '<div style="margin-bottom:6px"><span style="color:#9fe0ff;font-weight:700">一星：</span>'+card.text+'</div>' +
+          '<div style="margin-bottom:6px;color:#8a7f68"><span style="color:#b0a48c;font-weight:700">二星：</span>无特殊效果（仅数值 ×2）</div>' +
+          '<div><span style="color:#ffd86a;font-weight:700">三星：</span>'+(card.star3 || (window.CNCards && window.CNCards.gang3 && window.CNCards.gang3(card.name) ? window.CNCards.gang3(card.name).title : '无专属技能（仅数值 ×'+(STAR_UP[3])+'）'))+'</div>' +
+        '</div>' +
+        (star>=3 ? '<div style="margin-top:8px;font-size:10px;color:#ffd86a">已激活三星专属技能</div>' : '') +
         '<div style="margin-top:12px;font-size:10px;color:#5a4a3a">'+p.name+' · 三星 '+threeStarCount(p)+' / '+WIN_3STAR+'</div>' +
       '</div>' +
       '<button class="star-btn" id="cncardbtn" style="background:linear-gradient(160deg,'+accent+',#8a6f30);color:#1a1208">收 下</button>';
