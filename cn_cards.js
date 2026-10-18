@@ -489,6 +489,8 @@
   function rollShop(p, allStars){
     var lv = Math.min(8, Math.max(1, p.shopLevel || 1));
     var w = LEVEL_WEIGHTS[lv] || LEVEL_WEIGHTS[1];
+    // 2026-10-18：星枢引曜（赐福）——天罡权重 ×1.2
+    if(window.Boon && window.Boon.adjustWeights){ w = window.Boon.adjustWeights(p, w); }
     var buckets = {
       di:   allStars.filter(function(s){ return s.type==='di'; }),
       gang: allStars.filter(function(s){ return s.type==='gang'; }),
@@ -512,10 +514,24 @@
     return sale;
   }
 
+  /* 2026-10-18：卡牌效果说明（商店 / 弹窗共用）
+   * 优先级：card.text > GANG3.title > 引擎描述 > 兜底 */
+  function effectText(st, kind){
+    if(!st) return '（无描述）';
+    if(st.text) return st.text;
+    if(st.title && kind !== 'di') return st.title;
+    if(kind === 'gang' && GANG3[st.name]) return GANG3[st.name].title;
+    if(st.desc) return st.desc;
+    if(st.name) return '【'+st.name+'】按星宿原效果结算';
+    return '（无描述）';
+  }
+
   function showBuyShop(p, allStars){
     var sale = window.__BUY_SALE || [];
     var lv = Math.min(8, Math.max(1, p.shopLevel || 1));
     var nextCost = (lv < 8) ? LEVEL_COST[lv] : null;
+    // 2026-10-18：拔苗助长——按钮上显示的价也要跟着减
+    if(nextCost !== null && window.Boon && window.Boon.discountUpgrade){ nextCost = window.Boon.discountUpgrade(p, nextCost); }
 
     var rows = '';
     sale.forEach(function(it, i){
@@ -535,23 +551,24 @@
       var label = (kind==='di') ? '地煞' : (kind==='gang') ? '天罡' : (kind==='god' ? '神明' : '武将');
       var accent = (kind==='di') ? '#9fe0ff' : (kind==='gang') ? '#ffd86a' : (kind==='god') ? '#c9a961' : '#ff9a4a';
       rows += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;margin-bottom:6px;background:#1a1410;border:1px solid '+(kind==='di'?'#2e4a63':'#8a7040')+';border-radius:9px">' +
-        '<span style="font-size:12.5px;color:'+accent+';flex:1">'+label+'<br><b>'+st.name+'</b> <span style="font-size:10px;color:#8a7f68">'+stars+' '+cnt+'/9</span></span>' +
-        '<button class="star-btn" style="width:auto;margin:0;padding:7px 12px;font-size:11.5px" onclick="CNCards.buyOne('+i+', player[turn])">'+price+'💰</button>' +
+        '<span style="font-size:12.5px;color:'+accent+';flex:1">'+label+'<br><b>'+st.name+'</b> <span style="font-size:10px;color:#8a7f68">'+stars+' '+cnt+'/9</span>' +
+          '<div style="font-size:10px;color:#9a8f78;line-height:1.5;margin-top:3px">'+effectText(st, kind)+'</div></span>' +
+        '<button class="star-btn" style="width:auto;margin:0;padding:7px 12px;font-size:11.5px" onclick="CNCards.buyOne('+i+', player[turn])">'+price+'金</button>' +
       '</div>';
     });
 
     var html =
       '<div style="padding:16px 14px 10px">' +
         '<div style="text-align:center;font-size:15px;font-weight:900;color:#c9a961;letter-spacing:3px;margin-bottom:2px">🛒 星宿商店</div>' +
-        '<div style="text-align:center;font-size:11px;color:#8a7f68;margin-bottom:8px">金币 '+((p.coins||0))+' 💰 · 现金 '+(window.fmtMoney?fmtMoney(p.money):p.money)+' · 等级 '+lv+'</div>' +
+        '<div style="text-align:center;font-size:11px;color:#8a7f68;margin-bottom:8px">金币 '+((p.coins||0))+' · 现金 '+(window.fmtMoney?fmtMoney(p.money):p.money)+' · 等级 '+lv+'</div>' +
         rows +
         '<div style="display:flex;gap:6px;margin-top:8px">' +
-          '<button class="star-btn" style="flex:1;margin:0;padding:9px;font-size:12px" onclick="CNCards.refreshShop(player[turn])">🔄 刷新 1💰</button>' +
-          (nextCost !== null ? '<button class="star-btn" style="flex:1;margin:0;padding:9px;font-size:12px;background:linear-gradient(160deg,#c9a961,#8a6f30)" onclick="CNCards.upgradeLevel(player[turn])">⬆ 升'+(lv+1)+'级 '+nextCost+'💰</button>' : '<button class="star-btn" style="flex:1;margin:0;padding:9px;font-size:12px;opacity:.45">已满级</button>') +
+          '<button class="star-btn" style="flex:1;margin:0;padding:9px;font-size:12px" onclick="CNCards.refreshShop(player[turn])">🔄 刷新 1金</button>' +
+          (nextCost !== null ? '<button class="star-btn" style="flex:1;margin:0;padding:9px;font-size:12px;background:linear-gradient(160deg,#c9a961,#8a6f30)" onclick="CNCards.upgradeLevel(player[turn])">⬆ 升'+(lv+1)+'级 '+nextCost+'金</button>' : '<button class="star-btn" style="flex:1;margin:0;padding:9px;font-size:12px;opacity:.45">已满级</button>') +
         '</div>' +
         '<div style="display:flex;gap:6px;margin-top:6px">' +
-          '<button class="star-btn" style="flex:1;margin:0;padding:9px;font-size:11.5px;background:linear-gradient(160deg,#2a2219,#1a1410);color:#ddd2b8;border:1px solid #5a4f3a" onclick="CNCards.exchangeCoin(player[turn],1)">1万💰</button>' +
-          '<button class="star-btn" style="flex:1;margin:0;padding:9px;font-size:11.5px;background:linear-gradient(160deg,#2a2219,#1a1410);color:#ddd2b8;border:1px solid #5a4f3a" onclick="CNCards.exchangeCoin(player[turn],-1)">1💰换1万</button>' +
+          '<button class="star-btn" style="flex:1;margin:0;padding:9px;font-size:11.5px;background:linear-gradient(160deg,#2a2219,#1a1410);color:#ddd2b8;border:1px solid #5a4f3a" onclick="CNCards.exchangeCoin(player[turn],1)">1万 → 1金</button>' +
+          '<button class="star-btn" style="flex:1;margin:0;padding:9px;font-size:11.5px;background:linear-gradient(160deg,#2a2219,#1a1410);color:#ddd2b8;border:1px solid #5a4f3a" onclick="CNCards.exchangeCoin(player[turn],-1)">1金 → 1万</button>' +
         '</div>' +
       '</div>' +
       '<button class="star-btn" style="background:linear-gradient(160deg,#2a2219,#1a1410);color:#ddd2b8;border:1px solid #5a4f3a" onclick="document.getElementById(\'popupbackground\').style.display=\'none\';document.getElementById(\'popupwrap\').style.display=\'none\';document.getElementById(\'popup\').className=\'\';document.getElementById(\'popup\').style.background=\'\';">关 闭</button>';
@@ -583,6 +600,8 @@
     var lv = Math.min(8, Math.max(1, p.shopLevel || 1));
     if(lv >= 8){ return; }
     var cost = LEVEL_COST[lv];
+    // 2026-10-18：拔苗助长——升级消耗金币减 10%
+    if(window.Boon && window.Boon.discountUpgrade){ cost = window.Boon.discountUpgrade(p, cost); }
     if((p.coins||0) < cost){
       popup('<div style="text-align:center;padding:10px">金币不够，升到 '+(lv+1)+' 级要 '+cost+' 金币。</div>');
       return;
