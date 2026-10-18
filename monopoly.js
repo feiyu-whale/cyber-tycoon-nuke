@@ -1627,14 +1627,15 @@ function updateOption() {
 			buyhousebutton.disabled = false;
 			sellhousebutton.disabled = false;
 
-			buyhousebutton.value = "买房（$" + sq.houseprice + ")";
-			sellhousebutton.value = "卖房（$" + (sq.houseprice * 0.5) + ")";
-			buyhousebutton.title = "购买一栋房 $" + sq.houseprice;
-			sellhousebutton.title = "卖出一栋房 $" + (sq.houseprice * 0.5);
+			var _showCost = houseCost(sq, player[sq.owner]);
+			buyhousebutton.value = "买房（$" + _showCost + ")";
+			sellhousebutton.value = "卖房（$" + Math.round(sq.houseprice * 0.5) + ")";
+			buyhousebutton.title = "购买一栋房 $" + _showCost + "（原价 " + sq.houseprice + " + 现金 15%）";
+			sellhousebutton.title = "卖出一栋房 $" + Math.round(sq.houseprice * 0.5);
 
 			if (sq.house == 4) {
-				buyhousebutton.value = "买旅馆（$" + sq.houseprice + ")";
-				buyhousebutton.title = "购买旅馆 $" + sq.houseprice;
+				buyhousebutton.value = "买旅馆（$" + _showCost + ")";
+				buyhousebutton.title = "购买旅馆 $" + _showCost + "（原价 " + sq.houseprice + " + 现金 15%）";
 			}
 			if (sq.hotel == 1) {
 				$("#buyhousebutton").hide();
@@ -2147,11 +2148,21 @@ function buyHouse(index) {
 			}
 		}
 
-		p.pay(sq.houseprice, 0);
+		var realCost = houseCost(sq, p);
+		addAlert(p.name + ' 盖房花费 $' + realCost + '（原价 $' + sq.houseprice + ' + 现金 15%）');
+		p.pay(realCost, 0);
 
 		updateOwned();
 		updateMoney();
 	}
+}
+
+/* 2026-10-18 老爹定：盖房费 = 原价 + 当前现金 × 15%
+ *   保底按原价走，额外再加百分比 —— 钱越多，盖房越贵，多出来的钱正好花掉 */
+function houseCost(sq, p) {
+	var base = sq.houseprice || 0;
+	var extra = Math.round((p.money || 0) * 0.15);
+	return base + extra;
 }
 
 function sellHouse(index) {
@@ -3204,12 +3215,13 @@ window.onload = function() {
 		var houseSum = 0;
 		var hotelSum = 0;
 
-		if (p.money < s.houseprice) {
+		var _need = houseCost(s, p);
+		if (p.money < _need) {
 			if (s.house === 4) {
-				popup("<p>你还差 $" + (s.houseprice - player[s.owner].money) + " 才能给 " + s.name + " 盖旅馆。</p>");
+				popup("<p>你还差 $" + (_need - player[s.owner].money) + " 才能给 " + s.name + " 盖旅馆（总价 $" + _need + "）。</p>");
 				return;
 			} else {
-				popup("<p>你还差 $" + (s.houseprice - player[s.owner].money) + " 才能给 " + s.name + " 盖房子。</p>");
+				popup("<p>你还差 $" + (_need - player[s.owner].money) + " 才能给 " + s.name + " 盖房子（总价 $" + _need + "）。</p>");
 				return;
 			}
 		}
