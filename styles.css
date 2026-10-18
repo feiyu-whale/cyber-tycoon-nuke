@@ -1703,3 +1703,374 @@ input[type=button]:hover, button:hover { filter: brightness(1.2); }
 /* 顶部资金栏 */
 #moneybar td { color: #ddd2b8 !important; }
 .moneybarcell { border-color: #4a3f30 !important; }
+
+/* ============================================================
+   2026-10-18 v18：弹窗层级修复
+   抽卡弹窗被 #buy / #manage 面板压住 → 弹窗组整体抬到最高层
+   ============================================================ */
+#popupbackground { z-index: 9000 !important; }
+#popupwrap { z-index: 9001 !important; }
+#popup { position: relative !important; z-index: 9002 !important; }
+#statsbackground { z-index: 9000 !important; }
+#statswrap { z-index: 9001 !important; }
+
+/* 弹窗内文字不再挤成一行硬断 */
+#popuptext { overflow-x: hidden !important; }
+#popuptext div { word-break: break-word; }
+
+/* ============================================================
+   2026-10-18 v33：棋盘重做（学 MineMonopoly 气质·天空蓝/亮黄/米白）
+   结构：table → CSS Grid 11×11；外圈 41 格
+   思路借鉴（不抄代码），本项目仍为 MIT
+   ============================================================ */
+
+/* ---- 棋盘外框：浮空沙盘感 ---- */
+#boardwrap {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 10px;
+}
+
+#board {
+	display: grid !important;
+	grid-template-columns: 96px repeat(9, 68px) 96px;
+	grid-template-rows: 96px repeat(9, 68px) 96px;
+	gap: 4px;
+	padding: 10px;
+	border: none !important;
+	border-radius: 22px;
+	background: linear-gradient(160deg, #8fd3f4 0%, #a8e6cf 45%, #d4f1f9 100%) !important;
+	box-shadow:
+		0 18px 40px rgba(20, 80, 120, .28),
+		0 0 0 6px rgba(255, 255, 255, .55),
+		inset 0 2px 12px rgba(255, 255, 255, .9) !important;
+	position: relative;
+	overflow: hidden;
+}
+
+/* 天空装饰：两团云 */
+#board::before,
+#board::after {
+	content: '';
+	position: absolute;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .55);
+	filter: blur(18px);
+	pointer-events: none;
+	z-index: 0;
+}
+#board::before { width: 220px; height: 90px; top: 22%; left: 18%; }
+#board::after  { width: 180px; height: 76px; bottom: 20%; right: 16%; }
+
+/* ---- 格子：米白路面 + 亮黄边 + 圆角 ---- */
+#board .cell {
+	position: relative;
+	background: linear-gradient(175deg, #fffdf7 0%, #fdf3dc 100%) !important;
+	border: 2px solid #ffcf4d !important;
+	border-radius: 10px !important;
+	box-shadow:
+		0 4px 0 #e8b93a,
+		0 6px 12px rgba(120, 90, 20, .22) !important;
+	transition: transform .12s ease, box-shadow .12s ease;
+	z-index: 1;
+	overflow: hidden;
+	vertical-align: top;
+}
+
+/* 悬停：轻微抬起 */
+@media (hover: hover) {
+	#board .cell:hover {
+		transform: translateY(-3px);
+		box-shadow:
+			0 7px 0 #e8b93a,
+			0 10px 18px rgba(120, 90, 20, .3) !important;
+		z-index: 3;
+	}
+}
+
+/* 四角：金色更重 */
+#board .cell:nth-child(1),
+#board .cell:nth-child(11),
+#board .cell:nth-child(21),
+#board .cell:nth-child(31) {
+	background: linear-gradient(160deg, #fff8e1 0%, #ffe9a8 100%) !important;
+	border-color: #f5b400 !important;
+	border-radius: 14px !important;
+	box-shadow:
+		0 5px 0 #d99e00,
+		0 8px 16px rgba(120, 90, 20, .26) !important;
+}
+
+/* ---- 中心区：镂空透气 ---- */
+#boardCenter {
+	grid-area: 2 / 2 / 11 / 11;
+	position: relative;
+	border-radius: 16px;
+	background:
+		radial-gradient(circle at 30% 25%, rgba(255,255,255,.85) 0%, rgba(255,255,255,0) 55%),
+		linear-gradient(160deg, rgba(255,255,255,.35) 0%, rgba(180,230,250,.28) 100%);
+	box-shadow: inset 0 0 40px rgba(120, 190, 225, .35);
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* 中心区放个大标题 */
+#boardCenter::before {
+	content: '大富翁 · 星宿';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 26px;
+	font-weight: 900;
+	letter-spacing: 10px;
+	color: #ffffff;
+	text-shadow:
+		0 2px 0 rgba(150, 210, 235, .9),
+		0 6px 18px rgba(60, 140, 180, .35);
+	pointer-events: none;
+	white-space: nowrap;
+	opacity: .95;
+}
+
+/* 中心区上方飘一朵云 */
+#boardCenter::after {
+	content: '';
+	position: absolute;
+	top: 16%;
+	left: 22%;
+	width: 120px;
+	height: 44px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .75);
+	filter: blur(10px);
+	pointer-events: none;
+}
+
+/* ---- 格子里的文字元素 ---- */
+#board .cell-name {
+	position: absolute;
+	bottom: 2px;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	font-size: 10.5px !important;
+	line-height: 1.12;
+	color: #5a4520 !important;
+	font-weight: 800 !important;
+	padding: 1px 2px;
+	word-break: break-all;
+	z-index: 2;
+	background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,252,240,.85) 45%);
+	text-shadow: 0 1px 0 rgba(255,255,255,.9);
+}
+
+#board .cell-anchor {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	display: block;
+}
+
+#board .cell-position-holder {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	z-index: 3;
+}
+
+#board .cell-owner { z-index: 4; }
+
+/* 棋子：给个投影更立体 */
+#board .cell-position img {
+	filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .35));
+}
+
+/* 监狱格：中心区左下角，框内标明「🔒 监狱」（v33h 恢复） */
+#jail {
+	position: absolute !important;
+	left: 12px !important;
+	bottom: 12px !important;
+	top: auto !important;
+	width: 76px;
+	height: 76px;
+	border: 2px solid rgba(120, 180, 215, .75) !important;
+	border-radius: 14px;
+	background: rgba(255, 255, 255, .62);
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-size: 11px;
+	font-weight: 800;
+	color: #4a7fa5;
+	letter-spacing: 1px;
+	box-shadow: inset 0 0 12px rgba(150, 200, 230, .45);
+}
+#jail::before {
+	content: '🔒 监狱';
+	position: absolute;
+	top: -9px;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 9px;
+	font-weight: 800;
+	color: #5a93b8;
+	background: #eaf6fc;
+	padding: 1px 6px;
+	border-radius: 8px;
+	border: 1px solid rgba(120, 180, 215, .6);
+	white-space: nowrap;
+}
+@media (max-width: 720px) {
+	#jail { width: 52px; height: 52px; left: 6px !important; bottom: 6px !important; border-radius: 10px; }
+	#jail::before { font-size: 8px; padding: 1px 4px; top: -8px; }
+}
+
+
+/* ============================================================
+   2026-10-18 v33b：3D 透视模式（纯 CSS，body 加 class 即切换）
+   切换：document.body.classList.toggle('theme-3d')
+   ============================================================ */
+body.theme-3d #boardwrap {
+	perspective: 1600px;
+	perspective-origin: 50% 50%;
+	padding: 60px 10px 90px;
+}
+
+body.theme-3d #board {
+	transform: rotateX(26deg) rotateZ(0deg) scale(.92);
+	transform-style: preserve-3d;
+	transition: transform .5s cubic-bezier(.22,.9,.36,1);
+	box-shadow:
+		0 40px 60px rgba(30, 90, 130, .35),
+		0 0 0 6px rgba(255, 255, 255, .55),
+		inset 0 2px 12px rgba(255, 255, 255, .9) !important;
+}
+
+/* 格子加厚度：用 ::after 做侧面 */
+body.theme-3d #board .cell {
+	transform-style: preserve-3d;
+	transform: translateZ(0);
+}
+
+body.theme-3d #board .cell::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 100%;
+	height: 8px;
+	background: linear-gradient(180deg, #e8b93a 0%, #c99a20 100%);
+	border-radius: 0 0 10px 10px;
+	transform: rotateX(-90deg);
+	transform-origin: top center;
+	pointer-events: none;
+}
+
+/* 3D 下悬浮更明显 */
+@media (hover: hover) {
+	body.theme-3d #board .cell:hover {
+		transform: translateZ(12px) translateY(-2px);
+	}
+}
+
+/* 中心区在 3D 下稍微压低，形成凹槽感 */
+body.theme-3d #boardCenter {
+	transform: translateZ(-6px);
+	box-shadow: inset 0 0 50px rgba(90, 170, 210, .45);
+}
+
+/* 3D 切换按钮 */
+#view3d {
+	position: fixed;
+	right: 12px;
+	bottom: 12px;
+	z-index: 500;
+	padding: 8px 14px;
+	border-radius: 20px;
+	border: 2px solid #ffcf4d;
+	background: linear-gradient(160deg, #fffdf7, #fdf3dc);
+	color: #6b4e12;
+	font-size: 13px;
+	font-weight: 800;
+	box-shadow: 0 4px 0 #e8b93a, 0 6px 14px rgba(120,90,20,.25);
+	cursor: pointer;
+}
+#view3d:active { transform: translateY(2px); box-shadow: 0 2px 0 #e8b93a; }
+
+/* ============================================================
+   2026-10-18 v33c：棋盘手机适配
+   1) 格子尺寸改用 clamp，随屏宽自动缩放，不溢出
+   2) 3D 视角在窄屏下收窄倾斜角 + 整体缩放，保证整盘可见
+   ============================================================ */
+
+/* 棋盘尺寸：随视口缩放（最小 46px，最大 68px，角格 1.4 倍） */
+#board {
+	--cell: clamp(30px, 6.1vw, 68px);
+	--corner: calc(var(--cell) * 1.41);
+	grid-template-columns: var(--corner) repeat(9, var(--cell)) var(--corner) !important;
+	grid-template-rows: var(--corner) repeat(9, var(--cell)) var(--corner) !important;
+	gap: clamp(2px, .35vw, 4px);
+	padding: clamp(5px, .8vw, 10px);
+	max-width: calc(100vw - 12px);
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* 窄屏（手机）：字号跟着缩 */
+@media (max-width: 720px) {
+	#board .cell-name { font-size: 8px !important; line-height: 1.08; }
+	#boardCenter::before { font-size: 15px; letter-spacing: 4px; }
+	#jail { width: 74px; height: 74px; }
+}
+
+/* 3D 视角：窄屏把角度收小、整体缩小，保证不出屏 */
+@media (max-width: 720px) {
+	body.theme-3d #board {
+		transform: rotateX(16deg) scale(.86);
+	}
+	body.theme-3d #boardwrap {
+		padding: 18px 6px 30px;
+		perspective: 2000px;
+		overflow: hidden;
+	}
+}
+
+/* 特别窄（<420px）再收一档 */
+@media (max-width: 420px) {
+	#board {
+		--cell: clamp(26px, 6vw, 40px);
+	}
+	body.theme-3d #board {
+		transform: rotateX(13deg) scale(.82);
+	}
+	#board .cell-name { font-size: 7px !important; }
+}
+
+/* 3D 下禁止横向溢出 */
+body.theme-3d { overflow-x: hidden; }
+
+/* v33e：3D 按钮不再悬浮，改为页面内正常按钮，杜绝遮挡 */
+#view3d {
+	position: static !important;
+	display: block;
+	margin: 10px auto !important;
+	padding: 8px 20px;
+	font-size: 13px;
+	border-radius: 20px;
+	border: 2px solid #ffcf4d;
+	background: linear-gradient(160deg, #fffdf7, #fdf3dc);
+	color: #6b4e12;
+	font-weight: 800;
+	box-shadow: 0 3px 0 #e8b93a;
+	cursor: pointer;
+	max-width: 200px;
+}
+@media (max-width: 420px) {
+	#view3d { padding: 7px 16px; font-size: 12px; margin: 8px auto !important; }
+}

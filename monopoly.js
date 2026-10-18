@@ -1292,10 +1292,10 @@ function popup(HTML, action, option) {
 
 function updatePosition() {
 	// Reset borders
-	document.getElementById("jail").style.border = "1px solid black";
-	document.getElementById("jailpositionholder").innerHTML = "";
+	// 2026-10-18 v33：不再写死黑边框，边框交给 CSS（棋盘重做·天空蓝主题）
 	for (var i = 0; i < 40; i++) {
-		document.getElementById("cell" + i).style.border = "1px solid black";
+		var _c = document.getElementById("cell" + i);
+		if (_c) _c.style.border = "";
 		document.getElementById("cell" + i + "positionholder").innerHTML = "";
 
 	}
@@ -1331,38 +1331,35 @@ function updatePosition() {
 		}
 	}
 
-	left = 0;
-	top = 53;
+	// 2026-10-18 v33h：恢复——关押中的棋子画在中心区「监狱」框内
+	left = 6;
+	top = 8;
 	for (var i = turn; i <= pcount; i++) {
 		if (player[i].jail) {
-			document.getElementById("jailpositionholder").innerHTML += "<div class='cell-position' title='" + player[i].name + "' style='background-color: " + player[i].color + "; box-shadow: 0 0 0 3px #fff, 0 0 12px 4px " + player[i].color + ", 0 2px 6px rgba(0,0,0,.9); left: " + left + "px; top: " + top + "px;'></div>";
-
-			if (left === 36) {
-				left = 0;
-				top = 41;
-			} else {
-				left += 12;
-			}
+			var hJ = document.getElementById("jailpositionholder");
+			if (hJ) hJ.innerHTML += "<div class='cell-position' title='" + player[i].name + "' style='width:10px;height:10px;background-color:" + player[i].color + ";box-shadow:0 0 0 2px #fff, 0 0 8px 2px " + player[i].color + ";left:" + left + "px;top:" + top + "px;'></div>";
+			if (left >= 40) { left = 6; top += 14; } else { left += 14; }
 		}
 	}
 
 	for (var i = 1; i < turn; i++) {
 		if (player[i].jail) {
-			document.getElementById("jailpositionholder").innerHTML += "<div class='cell-position' title='" + player[i].name + "' style='background-color: " + player[i].color + "; box-shadow: 0 0 0 3px #fff, 0 0 12px 4px " + player[i].color + ", 0 2px 6px rgba(0,0,0,.9); left: " + left + "px; top: " + top + "px;'></div>";
-			if (left === 36) {
-				left = 0;
-				top = 41;
-			} else
-				left += 12;
+			var hJb = document.getElementById("jailpositionholder");
+			if (hJb) hJb.innerHTML += "<div class='cell-position' title='" + player[i].name + "' style='width:10px;height:10px;background-color:" + player[i].color + ";box-shadow:0 0 0 2px #fff, 0 0 8px 2px " + player[i].color + ";left:" + left + "px;top:" + top + "px;'></div>";
+			if (left >= 40) { left = 6; top += 14; } else { left += 14; }
 		}
 	}
 
 	p = player[turn];
 
+	// 2026-10-18 v33h：坐牢时高亮中心区「监狱」框
+	var _c10 = document.getElementById("cell10");
 	if (p.jail) {
-		document.getElementById("jail").style.border = "1px solid " + p.color;
+		var _j = document.getElementById("jail");
+		if (_j) _j.style.border = "2px solid " + p.color;
 	} else {
-		document.getElementById("cell" + p.position).style.border = "1px solid " + p.color;
+		var _cc = document.getElementById("cell" + p.position);
+		if (_cc) _cc.style.border = "2px solid " + p.color;
 	}
 
 	// for (var i=1; i <= pcount; i++) {
@@ -3126,7 +3123,8 @@ window.onload = function() {
 
 	// Jail corrections
 	$("<div>", {id: "jailpositionholder" }).appendTo("#jail");
-	$("<span>").text("Jail").appendTo("#jail");
+	// 2026-10-18 v33b：中心区已交给 CSS（#boardCenter::before 放标题），不再往 jail 里塞英文占位字
+	// $("<span>").text("Jail").appendTo("#jail");
 
 	document.getElementById("jail").enlargeId = "enlarge40";
 
