@@ -148,6 +148,8 @@
 
   function gain(p,v){
     var amt = Math.max(v, Math.round(p.money * PCT_IN)) * (window.__STAR_MULT||1);
+    // 2026-10-18：奇遇·财神眷顾——现金类收益 +20%
+    if(window.Encounter && window.Encounter.gainMultiplier){ amt = Math.round(amt * window.Encounter.gainMultiplier()); }
     p.money += amt;
     addAlert(p.name + ' 获得 $' + amt + '。');
   }
@@ -491,6 +493,8 @@
     var w = LEVEL_WEIGHTS[lv] || LEVEL_WEIGHTS[1];
     // 2026-10-18：星枢引曜（赐福）——天罡权重 ×1.2
     if(window.Boon && window.Boon.adjustWeights){ w = window.Boon.adjustWeights(p, w); }
+    // 2026-10-18：奇遇·群星璀璨——天罡权重 ×1.5
+    if(window.Encounter && window.Encounter.boostGangWeight){ w = window.Encounter.boostGangWeight(w); }
     var buckets = {
       di:   allStars.filter(function(s){ return s.type==='di'; }),
       gang: allStars.filter(function(s){ return s.type==='gang'; }),
@@ -585,12 +589,14 @@
   }
 
   function refreshShop(p){
-    if((p.coins||0) < REFRESH_COINS){
+    // 2026-10-18：奇遇·风调雨顺——刷新免费
+    var freeRefresh = (window.Encounter && window.Encounter.freeRefresh && window.Encounter.freeRefresh());
+    if(!freeRefresh && (p.coins||0) < REFRESH_COINS){
       popup('<div style="text-align:center;padding:10px">金币不够，刷新要 '+REFRESH_COINS+' 金币。</div>');
       return;
     }
-    p.coins -= REFRESH_COINS;
-    addAlert('【商店】'+p.name+' 花了 '+REFRESH_COINS+' 金币刷新商店。');
+    if(!freeRefresh){ p.coins -= REFRESH_COINS; }
+    addAlert('【商店】'+p.name+(freeRefresh?' 免费刷新了商店（奇遇·风调雨顺）。':' 花了 '+REFRESH_COINS+' 金币刷新商店。'));
     updateMoney();
     rollShop(p, window.StarEngine.stars());
     showBuyShop(p, window.StarEngine.stars());
