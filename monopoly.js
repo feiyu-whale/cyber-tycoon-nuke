@@ -2508,6 +2508,10 @@ function land(increasedRent) {
 		if (window.Boon && window.Boon.tollMultiplier) {
 			rent = Math.round(rent * window.Boon.tollMultiplier(p));
 		}
+		// 2026-10-18：奇遇·烈火烹油——过路费 +30%
+		if (window.Encounter && window.Encounter.tollMultiplier) {
+			rent = Math.round(rent * window.Encounter.tollMultiplier());
+		}
 		// 2026-10-18：福星高照——免交下一次过路费（不限金额）
 		if (p.freeRentOnce > 0) {
 			p.freeRentOnce--;
@@ -2857,6 +2861,13 @@ function setup() {
 	// 2026-10-18：开局掷一次隐藏卡出现概率（10%）
 	if (window.CNCards && window.CNCards.rollHiddenPresence) {
 		window.CNCards.rollHiddenPresence();
+	}
+
+	// 2026-10-18：开局掷奇遇（30% 出现，与无字天书互不影响，可同时存在）
+	if (window.Encounter) {
+		window.Encounter.roll();
+		window.Encounter.applyOnStart();
+		window.Encounter.announce();
 	}
 
 	// 2026-10-18：开局天罡地煞赐福——抽四张，全员投票
