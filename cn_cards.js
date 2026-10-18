@@ -140,21 +140,22 @@
     return list;
   }
   function rnd(n){ return Math.floor(Math.random()*n); }
-  /* 2026-10-18：卡片金额改成「百分比 + 兜底」
-   * 实际金额 = max(固定值, 当前现金 × 比例)，后期自动跟着资产涨 */
+  /* 2026-10-18（老爹定 v23）：卡片金额改成「固定价 + 百分比」
+   * 实际金额 = 固定值 + 当前现金 × 比例
+   * 后期膨胀得厉害，但扣得也厉害 —— 等于没有膨胀 */
   var PCT_IN = 0.10;      // 自身获得
   var PCT_OUT = 0.05;     // 自身失去
   var PCT_FROM = 0.08;    // 从单个对手拿
 
   function gain(p,v){
-    var amt = Math.max(v, Math.round(p.money * PCT_IN)) * (window.__STAR_MULT||1);
+    var amt = (v + Math.round(p.money * PCT_IN)) * (window.__STAR_MULT||1);
     // 2026-10-18：奇遇·财神眷顾——现金类收益 +20%
     if(window.Encounter && window.Encounter.gainMultiplier){ amt = Math.round(amt * window.Encounter.gainMultiplier()); }
     p.money += amt;
     addAlert(p.name + ' 获得 $' + amt + '。');
   }
   function lose(p,v){
-    var amt = Math.min(Math.max(v, Math.round(p.money * PCT_OUT)), p.money) * (window.__STAR_MULT||1);
+    var amt = Math.min(v + Math.round(p.money * PCT_OUT), p.money) * (window.__STAR_MULT||1);
     p.money -= amt;
     addAlert(p.name + ' 失去 $' + amt + '。');
   }
@@ -247,7 +248,7 @@
   function takeFromOne(p,v){
     var o=opponents(p); if(!o.length){ gain(p,5000); return; }
     var t=o[rnd(o.length)];
-    var base=Math.min(Math.max(v, Math.round(t.money * PCT_FROM)), t.money);
+    var base=Math.min(v + Math.round(t.money * PCT_FROM), t.money);
     var amt=Math.min(base * (window.__STAR_MULT||1), t.money);
     t.money-=amt; p.money+=amt; addAlert('【随机】'+p.name+' 抽中 '+t.name+'，'+t.name+' 向 '+p.name+' 支付了 $'+amt+'。');
   }
