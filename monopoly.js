@@ -2162,11 +2162,18 @@ function buyHouse(index) {
 	}
 }
 
+/* 2026-10-18 老爹定：计税/计价基数 = 现金 + 金币折现（防止换金币逃税） */
+function cashBase(p){
+	if(!p) return 0;
+	return (p.money || 0) + (p.coins || 0) * 10000;
+}
+window.cashBase = cashBase;
+
 /* 2026-10-18 老爹定：盖房费 = 原价 + 当前现金 × 25%（每盖一栋按剩余现金重算）
  *   保底按原价走，额外再加百分比 —— 钱越多，盖房越贵，多出来的钱正好花掉 */
 function houseCost(sq, p) {
 	var base = sq.houseprice || 0;
-	var extra = Math.round((p.money || 0) * 0.25);
+	var extra = Math.round(cashBase(p) * 0.25);
 	return base + extra;
 }
 
