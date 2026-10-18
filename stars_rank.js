@@ -185,8 +185,9 @@
 
     var html =
       '<div style="padding:18px 18px 12px;text-align:center">' +
-        '<div style="font-size:11px;letter-spacing:4px;color:'+accent+';opacity:.8;margin-bottom:10px">'+((kind==='war')?'武将降临':(kind==='mech'?'机制降临':'神明降临'))+'</div>' +
-        '<div style="font-size:32px;line-height:1;margin-bottom:6px">'+card.icon+'</div>' +
+        '<div style="font-size:11px;letter-spacing:4px;color:'+accent+';opacity:.8;margin-bottom:10px">'+
+          ((kind==='war')?'武将降临':(kind==='mech'?'机制降临':((kind==='di')||(card&&card.type==='di')?'地煞降临':(kind==='gang'||(card&&card.type==='gang')?'天罡降临':'神明降临'))))+'</div>' +
+        ((card.icon) ? '<div style="font-size:32px;line-height:1;margin-bottom:6px">'+card.icon+'</div>' : '<div style="height:8px;margin-bottom:6px"></div>') +
         '<div style="font-size:24px;font-weight:900;color:'+accent+';letter-spacing:3px;text-shadow:0 0 18px '+accent+'66">'+card.name+'</div>' +
         '<div style="font-size:20px;color:'+accent+';letter-spacing:6px;margin:8px 0">'+stars+(star>=4?' <span style="font-size:11px;letter-spacing:1px">四星·彩蛋</span>':'')+'</div>' +
         '<div style="font-size:11px;color:#8a7040;margin-bottom:10px">已收集 '+cnt+' 张 · 效果 ×'+STAR_UP[star]+'</div>' +
@@ -196,7 +197,12 @@
           '<div style="margin-bottom:6px;color:#8a7f68"><span style="color:#b0a48c;font-weight:700">二星：</span>无特殊效果（仅数值 ×2）</div>' +
           '<div><span style="color:#ffd86a;font-weight:700">三星：</span>'+(card.star3 || (window.CNCards && window.CNCards.gang3 && window.CNCards.gang3(card.name) ? window.CNCards.gang3(card.name).title : '无专属技能（仅数值 ×'+(STAR_UP[3])+'）'))+'</div>' +
         '</div>' +
-        (star>=3 ? '<div style="margin-top:8px;font-size:10px;color:#ffd86a">已激活三星专属技能</div>' : '') +
+        (star>=3 && !(kind==='di' || (card && card.type==='di')) ? '<div style="margin-top:8px;font-size:10px;color:#ffd86a">已激活三星专属技能</div>' : '') +
+        /* 2026-10-18 老爹定：地煞升到三星时提示「四星可能有惊喜」 */
+        ((kind==='di' || (card && card.type==='di')) && star===3 ?
+          '<div style="margin-top:9px;padding:8px 10px;background:#1e1a12;border:1px dashed #8a7040;border-radius:8px;font-size:11px;line-height:1.7;color:#e8d7a8">' +
+            '✦ <b style="color:#ffd86a">地煞不绝版</b> —— 继续收集同名卡，<b style="color:#ff7ab8">凑满 27 张可升至四星</b>，届时或有惊喜。' +
+          '</div>' : '') +
         '<div style="margin-top:12px;font-size:10px;color:#5a4a3a">'+p.name+' · 三星 '+threeStarCount(p)+' / '+WIN_3STAR+'</div>' +
       '</div>' +
       '<button class="star-btn" id="cncardbtn" style="background:linear-gradient(160deg,'+accent+',#8a6f30);color:#1a1208">收 下</button>';
