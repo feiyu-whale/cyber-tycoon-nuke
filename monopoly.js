@@ -1468,6 +1468,10 @@ function updateDice() {
 
 function updateOwned() {
 	var p = player[turn];
+	// 2026-10-18 联机：房主每次刷新地产面板，顺带把状态推给客方
+	if (window.MonopolyOnline && window.MonopolyOnline.isHost && window.MonopolyOnline.isHost()) {
+		if (window.MonopolyOnline.syncState) window.MonopolyOnline.syncState();
+	}
 	var checkedproperty = getCheckedProperty();
 	$("#option").show();
 	$("#owned").show();
@@ -2719,6 +2723,10 @@ function roll() {
 }
 
 function play() {
+	// 2026-10-18 联机：换人后同步状态
+	if (window.MonopolyOnline && window.MonopolyOnline.isHost && window.MonopolyOnline.isHost()) {
+		if (window.MonopolyOnline.syncState) window.MonopolyOnline.syncState();
+	}
 	if (game.auction()) {
 		return;
 	}
