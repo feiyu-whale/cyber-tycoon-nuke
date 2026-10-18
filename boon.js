@@ -139,6 +139,8 @@
    * ============================================================ */
   function drawFour(){
     var pool = BOONS.slice();
+    // 2026-10-18：奇遇·紫气东来——本局赐福必定仙品
+    if(window.Encounter && window.Encounter.filterBoons){ pool = window.Encounter.filterBoons(pool); }
     var out = [];
     for(var i=0;i<4 && pool.length;i++){
       var k = Math.floor(Math.random()*pool.length);
