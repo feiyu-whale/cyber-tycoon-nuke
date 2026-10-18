@@ -13,6 +13,8 @@
 	<script type="text/javascript" src="stars_engine.js"></script>
 	<script type="text/javascript" src="cn_cards.js"></script>
 	<script type="text/javascript" src="stars_rank.js"></script>
+	<script type="text/javascript" src="boon.js"></script>
+	<script type="text/javascript" src="handbook.js"></script>
 	<script type="text/javascript" src="online.js"></script>
 	<link rel="stylesheet" type="text/css" href="styles.css" />
 </head>
@@ -254,6 +256,7 @@
 						<input type="button" id="viewstats" value="资产统计" title="查看每位玩家名下的地产清单。" />
 						<input type="button" id="viewbag" value="🎴 机制卡袋" title="查看并手动使用你抽到的机制卡。" onclick="if(window.CNCards&&CNCards.openBag)CNCards.openBag(player[turn]);" />
 						<input type="button" id="buystar" value="🛒 买星宿卡" title="花 40000 买地煞、50000 买天罡（参考金铲铲商店）" onclick="if(window.CNCards&&CNCards.openBuy)CNCards.openBuy(player[turn]);" />
+						<input type="button" id="viewhandbook" value="📖 手册" title="查看游戏手册：赐福、规则、全部卡牌与星宿。" onclick="if(window.Handbook)Handbook.open();" />
 					</td>
 				</tr>
 			</table>
@@ -506,7 +509,7 @@
 		地标图标来自 <a href="images/landmarks/CREDITS.md" style="color:#4a6a8a">VeryIcon · hide-best</a>，站点声明可免费商用<br />
 		游戏本体移植自 <a href="https://github.com/intrepidcoder/monopoly" target="_blank" rel="noopener noreferrer" style="color:#4a6a8a">intrepidcoder/monopoly</a>（MIT 许可）
 	</div>
-	<div style="text-align:center;font-size:10px;color:#2a3a48;margin-top:6px">v17-初始现金1万 20261018</div>
+	<div style="text-align:center;font-size:10px;color:#2a3a48;margin-top:6px">v20-六条新赐福 20261018</div>
 	</div>
 
 	<div id="control">
