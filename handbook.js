@@ -147,6 +147,83 @@
     wrap.style.display = 'block';
   }
 
+  /* ============================================================
+   * 2026-10-18 老爹定：对手情报面板
+   *   每位玩家：总资产（现金+金币+房产）、二星卡、三星卡、四星
+   *   —— 公开信息，谁都能看
+   * ============================================================ */
+  function spy(){
+    if(typeof player === 'undefined' || typeof pcount === 'undefined'){ return; }
+    var S = window.CNStars;
+    var rows = [];
+    var data = [];
+    for(var i=1;i<=pcount;i++){
+      var pl = player[i];
+      if(!pl) continue;
+      var tot = (S && S.totalAssets) ? S.totalAssets(pl, i) : ((pl.money||0) + (pl.coins||0)*10000);
+      var st  = (S && S.starStats) ? S.starStats(pl) : {one:0,two:0,three:0,four:0,listTwo:[],listThree:[],listFour:[]};
+      data.push({ i:i, name:pl.name, color:pl.color, total:tot, st:st, isTurn:(i===turn) });
+    }
+    data.sort(function(a,b){ return b.total - a.total; });
+
+    data.forEach(function(d, r){
+      var st = d.st;
+      var chip = function(txt, col, ico){
+        return '<span style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;'+
+          'width:58px;height:19px;flex:0 0 58px;border-radius:9px;font-size:9.5px;font-weight:700;letter-spacing:.3px;'+
+          'background:'+col+'26;border:1px solid '+col+'99;color:'+col+';white-space:nowrap">'+ico+' '+txt+'</span>';
+      };
+      var cards = '';
+      if(st.listTwo.length){
+        st.listTwo.forEach(function(n){
+          cards += '<div style="display:flex;align-items:center;gap:9px;margin-top:7px">'+
+            chip('二星','#7dd3fc','★')+'<span style="font-size:11px;color:#cfd8e3">'+esc(n)+'</span></div>';
+        });
+      }
+      if(st.listThree.length){
+        st.listThree.forEach(function(n){
+          cards += '<div style="display:flex;align-items:center;gap:9px;margin-top:7px">'+
+            chip('三星','#fbbf24','★★')+'<span style="font-size:11px;color:#f0e2bd;font-weight:700">'+esc(n)+'</span></div>';
+        });
+      }
+      if(st.listFour.length){
+        st.listFour.forEach(function(n){
+          cards += '<div style="display:flex;align-items:center;gap:9px;margin-top:7px">'+
+            chip('四星','#f472b6','★★★')+'<span style="font-size:11px;color:#ffc4dd;font-weight:700">'+esc(n)+'</span></div>';
+        });
+      }
+      if(!cards){
+        cards = '<div style="margin-top:5px;font-size:10px;color:#5a4a3a">暂无升星卡</div>';
+      }
+
+      rows += '<div style="padding:10px 12px;margin-bottom:9px;background:#1a1410;border-left:3px solid '+d.color+';border-radius:6px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">' +
+          '<span style="font-size:12.5px;color:'+d.color+';font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(r+1)+'. '+esc(d.name)+(d.isTurn?' <span style="font-size:9px;color:#8a7f68">(当前)</span>':'')+'</span>' +
+          '<span style="font-size:12px;color:#ffd86a;font-weight:900;white-space:nowrap">'+(window.fmtMoney?fmtMoney(d.total):d.total)+'</span>' +
+        '</div>' +
+        '<div style="margin-top:2px">'+cards+'</div>' +
+      '</div>';
+    });
+
+    var html =
+      '<div style="padding:14px 12px 8px">' +
+        '<div style="text-align:center;font-size:15px;font-weight:900;color:#c9a961;letter-spacing:3px;margin-bottom:3px">🔍 对 手 情 报</div>' +
+        '<div style="text-align:center;font-size:10px;color:#8a7f68;margin-bottom:9px">总资产 = 现金 + 金币折现 + 名下地产估值</div>' +
+        '<div style="max-height:340px;overflow-y:auto;padding-right:2px">' + rows + '</div>' +
+      '</div>' +
+      '<button class="star-btn" style="background:linear-gradient(160deg,#2a2219,#1a1410);color:#ddd2b8;border:1px solid #5a4f3a" onclick="Handbook.close()">关 闭</button>';
+
+    var P = document.getElementById('popup'), txt = document.getElementById('popuptext');
+    txt.innerHTML = html;
+    P.className = 'star-popup';
+    P.style.width = '340px'; P.style.minWidth = '340px'; P.style.padding = '0';
+    P.style.background = 'linear-gradient(160deg,#241c16 0%,#12100c 100%)';
+    P.style.borderColor = '#8a7040';
+    var wrap = document.getElementById('popupwrap'), bgel = document.getElementById('popupbackground');
+    if(bgel) bgel.style.display = 'block';
+    wrap.style.display = 'block';
+  }
+
   function open(t){
     if(t) tab = t;
     render();
@@ -166,5 +243,5 @@
     if(P){ P.className = ''; P.style.background = ''; P.style.borderColor = ''; }
   }
 
-  window.Handbook = { open: open, close: close, _tab: setTab };
+  window.Handbook = { open: open, close: close, _tab: setTab, spy: spy };
 })();
