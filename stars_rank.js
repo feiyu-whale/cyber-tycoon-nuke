@@ -110,10 +110,19 @@
     var wentThree = (cnt === NEED_3);
     var wentFour  = (cnt === NEED_4);
 
-    // 2026-10-18：一旦升到三星，这张卡彻底绝版（全服不再出现）
-    if(wentThree){
+    // 2026-10-18 老爹定：地煞三星后「不绝版」（可继续攒到四星）；
+    //               天罡/武将/神明三星即全服绝版
+    var isDiCard = (kind === 'di') || (card && card.type === 'di');
+    if(wentThree && !isDiCard){
       retired[name] = true;
       if(window.addAlert) addAlert('【绝版】'+p.name+' 把「'+name+'」升到三星，此卡从此绝版，不再出现。');
+    } else if(wentThree && isDiCard){
+      if(window.addAlert) addAlert('【三星】'+p.name+' 把「'+name+'」升到三星（地煞不绝版，可继续攒至四星）。');
+    }
+    // 地煞升到四星才绝版
+    if(wentFour && isDiCard){
+      retired[name] = true;
+      if(window.addAlert) addAlert('【绝版】'+p.name+' 把「'+name+'」升到四星，此卡从此绝版。');
     }
     showStarUp(card, star, cnt, p, function(){
       // 彩蛋：任意一张卡合出「四星」→ 直接核弹
