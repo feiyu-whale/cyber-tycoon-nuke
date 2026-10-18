@@ -46,6 +46,20 @@
     return n;
   }
 
+  /* 2026-10-18：对手情报——统计某玩家各星级的卡牌数量 */
+  function starStats(p){
+    var d = deckOf(p), n1=0, n2=0, n3=0, n4=0, list2=[], list3=[], list4=[];
+    for(var k in d){
+      var c = d[k] || 0;
+      var st = starOf(c);
+      if(st >= 4){ n4++; list4.push(k); }
+      else if(st === 3){ n3++; list3.push(k); }
+      else if(st === 2){ n2++; list2.push(k); }
+      else if(c > 0){ n1++; }
+    }
+    return { one:n1, two:n2, three:n3, four:n4, listTwo:list2, listThree:list3, listFour:list4 };
+  }
+
   /* 抽到一张神明卡：累计 → 算星级 → 按星级放大效果 */
   function drawAndApply(p, card, kind){
     var d = deckOf(p);
@@ -206,14 +220,34 @@
    *   上限 = 1,000 万亿 × 1 亿 = 1e15（正常对局碰不到，纯防溢出）
    *   有人到顶 → 本局直接结束，到顶者夺冠（跟核弹同一套结算）
    * ============================================================ */
-  var MONEY_CAP = 1e15;   // 10,000,000 亿
+  var MONEY_CAP = 1e15;   // 10,000,000 亿（总资产上限）
+
+  /* 总资产 = 现金 + 金币折现 + 名下地产估值（地价 + 房子 + 旅馆） */
+  function totalAssets(pl, idx){
+    var cash = (pl.money || 0) + (pl.coins || 0) * 10000;
+    var prop = 0;
+    if(typeof square !== 'undefined'){
+      for(var k=0;k<square.length;k++){
+        var sq = square[k];
+        if(!sq || sq.owner !== idx || !(sq.price > 0)) continue;
+        var hp = sq.houseprice || 0;
+        if(sq.mortgage){
+          // 已抵押：只计地价一半（已变现），房子不算
+          prop += sq.price * 0.5;
+        } else {
+          prop += sq.price + (sq.house || 0) * hp + (sq.hotel ? hp : 0);
+        }
+      }
+    }
+    return cash + prop;
+  }
 
   function checkMoneyCap(){
     if(GAME_LOCKED) return false;
     for(var i=1;i<=pcount;i++){
       var pl = player[i];
       if(!pl) continue;
-      if((pl.money||0) >= MONEY_CAP || (pl.coins||0) * 10000 >= MONEY_CAP){
+      if(totalAssets(pl, i) >= MONEY_CAP){
         riceRocket(pl, '资产封顶');
         return true;
       }
@@ -287,11 +321,13 @@
     isLocked: function(){ return GAME_LOCKED; },
     unlock: function(){ GAME_LOCKED = false; window.__RICE_WINNER = null; },
     checkMoneyCap: checkMoneyCap,
+    totalAssets: totalAssets,
     MONEY_CAP: MONEY_CAP,
     drawAndApply: drawAndApply,
     forceThree: forceThree,
     starOf: starOf,
     threeStarCount: threeStarCount,
+    starStats: starStats,
     deckOf: deckOf,
     STAR_UP: STAR_UP,
     NEED_4: NEED_4
