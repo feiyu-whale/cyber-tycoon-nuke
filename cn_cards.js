@@ -148,14 +148,16 @@
   var PCT_FROM = 0.08;    // 从单个对手拿
 
   function gain(p,v){
-    var amt = (v + Math.round(p.money * PCT_IN)) * (window.__STAR_MULT||1);
+    var _base = window.cashBase ? window.cashBase(p) : p.money;
+    var amt = (v + Math.round(_base * PCT_IN)) * (window.__STAR_MULT||1);
     // 2026-10-18：奇遇·财神眷顾——现金类收益 +20%
     if(window.Encounter && window.Encounter.gainMultiplier){ amt = Math.round(amt * window.Encounter.gainMultiplier()); }
     p.money += amt;
     addAlert(p.name + ' 获得 $' + amt + '。');
   }
   function lose(p,v){
-    var amt = Math.min(v + Math.round(p.money * PCT_OUT), p.money) * (window.__STAR_MULT||1);
+    var _base = window.cashBase ? window.cashBase(p) : p.money;
+    var amt = Math.min(v + Math.round(_base * PCT_OUT), p.money) * (window.__STAR_MULT||1);
     p.money -= amt;
     addAlert(p.name + ' 失去 $' + amt + '。');
   }
@@ -248,7 +250,8 @@
   function takeFromOne(p,v){
     var o=opponents(p); if(!o.length){ gain(p,5000); return; }
     var t=o[rnd(o.length)];
-    var base=Math.min(v + Math.round(t.money * PCT_FROM), t.money);
+    var _tb = window.cashBase ? window.cashBase(t) : t.money;
+    var base=Math.min(v + Math.round(_tb * PCT_FROM), t.money);
     var amt=Math.min(base * (window.__STAR_MULT||1), t.money);
     t.money-=amt; p.money+=amt; addAlert('【随机】'+p.name+' 抽中 '+t.name+'，'+t.name+' 向 '+p.name+' 支付了 $'+amt+'。');
   }
