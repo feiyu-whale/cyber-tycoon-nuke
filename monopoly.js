@@ -60,6 +60,10 @@ function Game() {
 			p.pay(highestbid, 0);
 			sq.owner = highestbidder;
 			addAlert(p.name + " 以 $" + highestbid + " 拍得了 " + sq.name + "。");
+			// 2026-10-18：拍场抽佣——放弃购买者的中介费
+			if (window.Boon && window.Boon.onAuctionSold) {
+				window.Boon.onAuctionSold(highestbidder, highestbid, auctionproperty);
+			}
 		}
 
 		for (var i = 1; i <= pcount; i++) {
@@ -2390,6 +2394,14 @@ function moveAnimated(steps, callback) {
 		addAlert(p.name + " 经过起点，领取 $200，并获得 1 金币。");
 				updateMoney();
 			}
+			// 2026-10-18：滚雪成山——经过四个角各结算一次利息
+			if (window.Boon && window.Boon.onPassCorner) {
+				window.Boon.onPassCorner(p, p.position);
+			}
+			// 2026-10-18：聚宝盆——经过起点额外领现金 5%
+			if (p.position === 0 && window.Boon && window.Boon.onPassStart) {
+				window.Boon.onPassStart(p);
+			}
 		} else {
 			p.position = (p.position - 1 + 40) % 40;
 		}
@@ -2492,6 +2504,20 @@ function land(increasedRent) {
 			}
 		}
 
+		// 2026-10-18：孤注一掷——过路费翻倍
+		if (window.Boon && window.Boon.tollMultiplier) {
+			rent = Math.round(rent * window.Boon.tollMultiplier(p));
+		}
+		// 2026-10-18：福星高照——免交下一次过路费（不限金额）
+		if (p.freeRentOnce > 0) {
+			p.freeRentOnce--;
+			addAlert("【福星高照】" + p.name + " 免交了 $" + rent + " 过路费。");
+			rent = 0;
+		}
+		// 2026-10-18：杀破狼·极——收租方 30% 概率双倍
+		if (window.Boon && window.Boon.rentCrit) {
+			rent = window.Boon.rentCrit(player[s.owner], rent);
+		}
 		addAlert(p.name + " 向 " + player[s.owner].name + " 支付了 $" + rent + " 租金。");
 		p.pay(rent, s.owner);
 		player[s.owner].money += rent;
@@ -2682,6 +2708,11 @@ function play() {
 
 	addAlert("轮到 " + p.name + " 了。");
 
+	// 2026-10-18：乾坤大挪移——每回合开始随机互换一块地
+	if (window.Boon && window.Boon.shiftProperty) {
+		window.Boon.shiftProperty(p);
+	}
+
 	// Check for bankruptcy.
 	p.pay(0, p.creditor);
 
@@ -2826,6 +2857,11 @@ function setup() {
 	// 2026-10-18：开局掷一次隐藏卡出现概率（10%）
 	if (window.CNCards && window.CNCards.rollHiddenPresence) {
 		window.CNCards.rollHiddenPresence();
+	}
+
+	// 2026-10-18：开局天罡地煞赐福——抽四张，全员投票
+	if (window.Boon && window.Boon.startVote) {
+		setTimeout(function(){ window.Boon.startVote(); }, 300);
 	}
 
 	// 2026-10-17 修复：显示棋盘后浏览器可能自动横向滚动，强制回正
