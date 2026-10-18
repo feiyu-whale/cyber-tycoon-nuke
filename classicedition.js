@@ -85,21 +85,23 @@ function transtext() {
 function luxurytax() {
 	// 2026-10-18 v23：奢侈税改为「固定 1500 + 总资产 5%」（老爹定：固定价+百分比）
 	var p = player[turn];
-	var tax = 1500 + Math.round(p.money * 0.05);
-	addAlert(p.name + " 落在奢侈税，缴纳 $" + tax + "（$1500 + 总资产 5%）。");
+	var _base1 = window.cashBase ? window.cashBase(p) : p.money;
+	var tax = 1500 + Math.round(_base1 * 0.05);
+	addAlert(p.name + " 落在奢侈税，缴纳 $" + tax + "（$1500 + 总资产 5%，含金币）。");
 	p.pay(tax, 0);
 
-	$("#landed").show().text("你落在了奢侈税。缴纳 $" + tax + "（$1500 + 总资产 5%）。");
+	$("#landed").show().text("你落在了奢侈税。缴纳 $" + tax + "（$1500 + 总资产 5%，含金币）。");
 }
 
 function citytax() {
 	// 2026-10-18 v23：城市税改为「固定 3000 + 总资产 10%」（老爹定：固定价+百分比）
 	var p = player[turn];
-	var tax = 3000 + Math.round(p.money * 0.10);
-	addAlert(p.name + " 落在城市税，缴纳 $" + tax + "（$3000 + 总资产 10%）。");
+	var _base2 = window.cashBase ? window.cashBase(p) : p.money;
+	var tax = 3000 + Math.round(_base2 * 0.10);
+	addAlert(p.name + " 落在城市税，缴纳 $" + tax + "（$3000 + 总资产 10%，含金币）。");
 	p.pay(tax, 0);
 
-	$("#landed").show().text("你落在了城市税。缴纳 $" + tax + "（$3000 + 总资产 10%）。");
+	$("#landed").show().text("你落在了城市税。缴纳 $" + tax + "（$3000 + 总资产 10%，含金币）。");
 }
 
 var square = [];
