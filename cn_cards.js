@@ -486,7 +486,15 @@
       if(!pool || !pool.length){
         popup('<div style="text-align:center;padding:10px">星宿数据没取到，稍后再试。</div>'); return;
       }
-      rollShop(p, pool);
+      // 2026-10-18 老爹定：打开商店「不自动刷新」——货架保持不动，
+      // 否则关掉再开就能白嫖一次刷新，花钱刷新按钮就没意义了
+      // 只有第一次（本局还没刷过货架）或换人时才生成
+      var needRoll = !window.__BUY_SALE || !window.__BUY_SALE.length ||
+                     window.__BUY_SALE_OWNER !== player.indexOf(p);
+      if(needRoll){
+        rollShop(p, pool);
+        window.__BUY_SALE_OWNER = player.indexOf(p);
+      }
       showBuyShop(p, pool);
     });
   }
@@ -603,6 +611,7 @@
     addAlert('【商店】'+p.name+(freeRefresh?' 免费刷新了商店（奇遇·风调雨顺）。':' 花了 '+REFRESH_COINS+' 金币刷新商店。'));
     updateMoney();
     rollShop(p, window.StarEngine.stars());
+    window.__BUY_SALE_OWNER = player.indexOf(p);
     showBuyShop(p, window.StarEngine.stars());
   }
 
