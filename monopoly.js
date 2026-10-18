@@ -1387,6 +1387,11 @@ window.fmtMoney = fmtMoney;
 function updateMoney() {
 	var p = player[turn];
 
+	// 2026-10-18：资产封顶测算——有人到顶 → 本局直接结束
+	if (window.CNStars && window.CNStars.checkMoneyCap) {
+		try { if (window.CNStars.checkMoneyCap()) { return; } } catch(e){}
+	}
+
 	document.getElementById("pmoney").innerHTML = fmtMoney(p.money);
 	$(".money-bar-row").hide();
 
