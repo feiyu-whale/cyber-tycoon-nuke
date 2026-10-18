@@ -1630,12 +1630,12 @@ function updateOption() {
 			var _showCost = houseCost(sq, player[sq.owner]);
 			buyhousebutton.value = "买房（$" + _showCost + ")";
 			sellhousebutton.value = "卖房（$" + Math.round(sq.houseprice * 0.5) + ")";
-			buyhousebutton.title = "购买一栋房 $" + _showCost + "（原价 " + sq.houseprice + " + 现金 15%）";
+			buyhousebutton.title = "购买一栋房 $" + _showCost + "（原价 " + sq.houseprice + " + 现金 25%）";
 			sellhousebutton.title = "卖出一栋房 $" + Math.round(sq.houseprice * 0.5);
 
 			if (sq.house == 4) {
 				buyhousebutton.value = "买旅馆（$" + _showCost + ")";
-				buyhousebutton.title = "购买旅馆 $" + _showCost + "（原价 " + sq.houseprice + " + 现金 15%）";
+				buyhousebutton.title = "购买旅馆 $" + _showCost + "（原价 " + sq.houseprice + " + 现金 25%）";
 			}
 			if (sq.hotel == 1) {
 				$("#buyhousebutton").hide();
@@ -2149,7 +2149,7 @@ function buyHouse(index) {
 		}
 
 		var realCost = houseCost(sq, p);
-		addAlert(p.name + ' 盖房花费 $' + realCost + '（原价 $' + sq.houseprice + ' + 现金 15%）');
+		addAlert(p.name + ' 盖房花费 $' + realCost + '（原价 $' + sq.houseprice + ' + 现金 25%）');
 		p.pay(realCost, 0);
 
 		updateOwned();
@@ -2157,11 +2157,11 @@ function buyHouse(index) {
 	}
 }
 
-/* 2026-10-18 老爹定：盖房费 = 原价 + 当前现金 × 15%
+/* 2026-10-18 老爹定：盖房费 = 原价 + 当前现金 × 25%（每盖一栋按剩余现金重算）
  *   保底按原价走，额外再加百分比 —— 钱越多，盖房越贵，多出来的钱正好花掉 */
 function houseCost(sq, p) {
 	var base = sq.houseprice || 0;
-	var extra = Math.round((p.money || 0) * 0.15);
+	var extra = Math.round((p.money || 0) * 0.25);
 	return base + extra;
 }
 
