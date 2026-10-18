@@ -23,7 +23,10 @@
   var NEED_2 = 3, NEED_3 = 9, NEED_4 = 27;   // 升星张数（3→9→27）
   var WIN_3STAR = 5;                          // 五张三星触发
   var decks = {};                             // decks[玩家序号][卡名] = 累计抽到张数
-  var retired = {};                           // 已升到三星、彻底绝版的卡（全服共享）
+  var retired = {};                           // 已升到三星、彻底绝版的卡（全服共享，旧口径，保留兼容）
+  // 2026-10-18 老爹定：三星后「别人绝版、自己不绝版」→ 按玩家记录
+  //   retiredBy[玩家序号][卡名] = true  → 该卡从【其他玩家】的抽取池里移除
+  var retiredBy = {};
   var GAME_LOCKED = false;                    // 白饭核弹触发后锁死一切
 
   function deckOf(p){
@@ -114,15 +117,18 @@
     //               天罡/武将/神明三星即全服绝版
     var isDiCard = (kind === 'di') || (card && card.type === 'di');
     if(wentThree && !isDiCard){
-      retired[name] = true;
-      if(window.addAlert) addAlert('【绝版】'+p.name+' 把「'+name+'」升到三星，此卡从此绝版，不再出现。');
+      // 天罡/武将/神明：三星 → 对别人绝版，自己还能继续抽到（再吃效果）
+      var _me = player.indexOf(p);
+      markRetiredFor(_me, name);
+      if(window.addAlert) addAlert('【绝版】'+name+' 对其他人绝版了（'+p.name+' 仍可继续抽到）。');
     } else if(wentThree && isDiCard){
-      if(window.addAlert) addAlert('【三星】'+p.name+' 把「'+name+'」升到三星（地煞不绝版，可继续攒至四星）。');
+      if(window.addAlert) addAlert('【三星提示】'+p.name+' 把「'+name+'」升到三星（地煞不绝版，别人也还能抽到，可继续攒至四星）。');
     }
     // 地煞升到四星才绝版
     if(wentFour && isDiCard){
+      // 地煞四星：全服绝版（这个不变）
       retired[name] = true;
-      if(window.addAlert) addAlert('【绝版】'+p.name+' 把「'+name+'」升到四星，此卡从此绝版。');
+      if(window.addAlert) addAlert('【绝版】'+name+' 已被 '+p.name+' 升到四星，此卡全服绝版。');
     }
     showStarUp(card, star, cnt, p, function(){
       // 彩蛋：任意一张卡合出「四星」→ 直接核弹
@@ -329,10 +335,41 @@
     wrap.style.display='block';
   }
 
+  /* 2026-10-18：三星卡「对别人绝版、自己不绝版」 */
+  // 保险：地煞星永不进入「三星对别人绝版」表（地煞三星不绝版、可攒四星）
+  var DI_NAMES = null;
+  function isDiStarName(name){
+    if(!DI_NAMES){
+      DI_NAMES = {};
+      var db = (window.StarEngine && window.StarEngine.stars) ? window.StarEngine.stars() : null;
+      if(db && db.length){
+        for(var i=0;i<db.length;i++){ if(db[i].type === 'di') DI_NAMES[db[i].name] = true; }
+      }
+    }
+    return !!DI_NAMES[name];
+  }
+  function markRetiredFor(playerIdx, name){
+    if(isDiStarName(name)) return false;      // 保险：地煞一律不放行
+    if(!(playerIdx in retiredBy)) retiredBy[playerIdx] = {};
+    retiredBy[playerIdx][name] = true;
+    return true;
+  }
+  /* 该玩家能否抽到这张卡：全服绝版（地煞四星）→ 谁都不能；别人三星过 → 只有那个人能抽 */
+  function canDrawFor(p, name){
+    if(retired[name]) return false;                  // 全服绝版（地煞四星）
+    var me = player.indexOf(p);
+    for(var idx in retiredBy){
+      if(String(idx) !== String(me) && retiredBy[idx][name]) return false;  // 别人三星过 → 我不能抽
+    }
+    return true;
+  }
+
   /* 导出 */
   window.CNStars = {
     isRetired: function(name){ return !!retired[name]; },
     retiredList: function(){ return retired; },
+    canDrawFor: canDrawFor,
+    markRetiredFor: markRetiredFor,
     isLocked: function(){ return GAME_LOCKED; },
     unlock: function(){ GAME_LOCKED = false; window.__RICE_WINNER = null; },
     checkMoneyCap: checkMoneyCap,

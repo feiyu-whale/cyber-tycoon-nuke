@@ -492,10 +492,19 @@
   }
 
   /* ---------- 抽星：天罡格出天罡，地煞格出地煞 ---------- */
-  function drawStar(kind){
+  function drawStar(kind, p){
     var pool = [];
     for(var i = 0; i < STAR_DB.length; i++){
       if(STAR_DB[i].type === kind){ pool.push(STAR_DB[i]); }
+    }
+    // 2026-10-18 老爹定：天罡三星后「别人绝版、自己不绝版」→ 按玩家过滤
+    // 地煞不受此限（canDrawFor 内部只对天罡三星生效，地煞无三星绝版）
+    if(p && window.CNStars && window.CNStars.canDrawFor){
+      var filtered = [];
+      for(var j = 0; j < pool.length; j++){
+        if(window.CNStars.canDrawFor(p, pool[j].name)) filtered.push(pool[j]);
+      }
+      if(filtered.length) pool = filtered;   // 兜底：全被过滤就保留原池，避免抽空
     }
     if(!pool.length) return null;
     return pool[secureRand(pool.length)];
@@ -566,7 +575,7 @@
     inStarEvent = true;
 
     loadStars(function(){
-      var star = drawStar(kind);
+      var star = drawStar(kind, p);
       if(!star){ inStarEvent = false; if(after) after(); return; }
       recordDex(star);
       applyEffect(star, p);
