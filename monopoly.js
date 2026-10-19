@@ -1143,7 +1143,13 @@ function Player(name, color) {
 			if (use > 0) {
 				this.coins -= use;
 				this.money += use * 10000;
-				addAlert('【自动兑换】' + this.name + ' 现金不足，自动兑换 ' + use + ' 金币（+$' + (use * 10000) + '）用于支付。');
+				/* 2026-10-19 v39：兑完仍不够时，日志得说清楚“还差多少”，不能写成已搞定 */
+				var _after = amount - this.money;
+				if (_after > 0) {
+					addAlert('【自动兑换】' + this.name + ' 现金不足，自动兑换 ' + use + ' 金币（+$' + (use * 10000) + '），但仍差 $' + _after + '，无法完成支付。');
+				} else {
+					addAlert('【自动兑换】' + this.name + ' 现金不足，自动兑换 ' + use + ' 金币（+$' + (use * 10000) + '）用于支付。');
+				}
 			}
 		}
 		if (amount <= this.money) {
