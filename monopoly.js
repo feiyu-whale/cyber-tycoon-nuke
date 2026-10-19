@@ -1671,7 +1671,7 @@ function updateOption() {
 			buyhousebutton.value = "买房（$" + _showCost + ")";
 			sellhousebutton.value = "卖房（$" + Math.round(sq.houseprice * 0.5) + ")";
 			buyhousebutton.title = "购买一栋房 $" + _showCost + "（原价 " + sq.houseprice + " + 现金 25%）";
-			sellhousebutton.title = "卖出一栋房 $" + Math.round(sq.houseprice * 0.5);
+			sellhousebutton.title = "卖出一栋房 $" + Math.round(sq.houseprice * 0.5) + "（只退原价 50%，盖房时多付的附加费不退）";
 
 			if (sq.house == 4) {
 				buyhousebutton.value = "买旅馆（$" + _showCost + ")";
@@ -1680,7 +1680,7 @@ function updateOption() {
 			if (sq.hotel == 1) {
 				$("#buyhousebutton").hide();
 				sellhousebutton.value = "卖旅馆（$" + (sq.houseprice * 0.5) + ")";
-				sellhousebutton.title = "卖出旅馆 $" + (sq.houseprice * 0.5);
+				sellhousebutton.title = "卖出旅馆 $" + (sq.houseprice * 0.5) + "（只退原价 50%，盖房时多付的附加费不退）";
 			}
 
 			var maxhouse = 0;
