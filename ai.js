@@ -180,7 +180,7 @@ function AITest(p) {
 			s = square[i];
 
 			if (s.owner === p.index && !s.mortgage && s.house === 0) {
-				mortgage(i);
+				mortgage(i, true);   /* v40：还债模式，只押到抵平债务 */
 				console.log(s.name);
 			}
 
