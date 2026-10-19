@@ -2258,9 +2258,11 @@ function sellHouse(index) {
 	sq = square[index];
 	p = player[sq.owner];
 
-	/* 2026-10-19 v38 修负资产漏洞：负债状态下禁止卖房（防「卖房→少欠债→变相白拿」） */
-	if ((p.money || 0) < 0) {
-		addAlert('【负债锁】' + p.name + ' 现金为负（' + fmtMoney(p.money) + '），负债期间不能卖房。先还清债务。');
+	/* 2026-10-19 v40：卖房同理——负债时只允许「卖到刚好抵平债务」。 */
+	var debtMode = arguments.length > 1 && arguments[1] === true;
+	var cash = p.money || 0;
+	if (cash < 0 && !debtMode) {
+		addAlert('【负债锁】' + p.name + ' 现金为负（' + fmtMoney(cash) + '），负债期间不能主动卖房。');
 		return;
 	}
 
@@ -2273,7 +2275,14 @@ function sellHouse(index) {
 		addAlert(p.name + " 卖掉了 " + sq.name + " 上的一栋房子。");
 	}
 
-	p.money += sq.houseprice * 0.5;
+	var gain = sq.houseprice * 0.5;
+	if (cash < 0 && debtMode && gain > -cash) {
+		/* 回滚刚才的房屋数量变更 */
+		if (sq.hotel === 0 && sq.house === 4) { sq.hotel = 1; sq.house = 0; } else { sq.house++; }
+		addAlert('【负债锁】' + p.name + ' 卖这栋房能换 $' + gain + '，但欠款只有 $' + (-cash) + '，超出部分不允许变现。');
+		return;
+	}
+	p.money += gain;
 	updateOwned();
 	updateMoney();
 }
@@ -2442,11 +2451,11 @@ function mortgage(index) {
 	var sq = square[index];
 	var p = player[sq.owner];
 
-	/* 2026-10-19 v38 修负资产漏洞：负债状态下禁止抵押（防「抵押→买地→再抵押」刷图） */
-	if ((p.money || 0) < 0) {
-		addAlert('【负债锁】' + p.name + ' 现金为负（' + fmtMoney(p.money) + '），负债期间不能抵押。先还清债务。');
-		return false;
-	}
+	/* 2026-10-19 v40 修 bug2：负债锁改成「还债模式」。
+	 * 负债时仍不能随意抵押（防「抵押→买地→再抵押」刷图），
+	 * 但允许「只押到刚好抵平债务」——AI 的 payDebt() 与真人自救都靠这条。 */
+	var debtMode = arguments.length > 1 && arguments[1] === true;
+	var cash = p.money || 0;
 
 	if (sq.house > 0 || sq.hotel > 0 || sq.mortgage) {
 		return false;
@@ -2455,13 +2464,26 @@ function mortgage(index) {
 	var mortgagePrice = Math.round(sq.price * 0.5);
 	var unmortgagePrice = Math.round(sq.price * 0.55);
 
+	/* v40：负债状态下，只允许押到把现金拉回 >= 0；超出部分照样锁死。 */
+	if (cash < 0 && !debtMode) {
+		addAlert('【负债锁】' + p.name + ' 现金为负（' + fmtMoney(cash) + '），负债期间不能主动抵押。');
+		return false;
+	}
+	if (cash < 0 && debtMode) {
+		var need = -cash;
+		if (mortgagePrice > need) {
+			addAlert('【负债锁】' + p.name + ' 抵押 ' + sq.name + ' 只能换 $' + mortgagePrice + '，但欠款只有 $' + need + '，超出部分不允许变现。');
+			return false;
+		}
+	}
+
 	sq.mortgage = true;
 	p.money += mortgagePrice;
 
 	document.getElementById("mortgagebutton").value = "赎回 $" + unmortgagePrice;
 	document.getElementById("mortgagebutton").title = "赎回 " + sq.name + " for $" + unmortgagePrice + ".";
 
-	addAlert(p.name + " 把 " + sq.name + " 抵押出去，换得 $" + mortgagePrice + "。");
+	addAlert(p.name + " 把 " + sq.name + " 抵押出去，换得 $" + mortgagePrice + "。" + (cash < 0 ? '（还债模式）' : ''));
 	updateOwned();
 	updateMoney();
 
