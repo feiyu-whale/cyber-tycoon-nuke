@@ -15,9 +15,9 @@
     { name:'吕布', icon:'🗡️', title:'无双乱舞', text:'随机指定一名对手，该对手向你支付 8000', star3:'【无双】随机一名对手的全部现金归你', star3fn:function(p){ var o=opponents(p); if(!o.length){gain(p,20000);return;} var t=o[rnd(o.length)]; var amt=t.money; t.money=0; p.money+=amt; addAlert('【无双】'+t.name+' 的全部现金 $'+amt+' 归 '+p.name+'。'); }, fn:function(p){ takeFromOne(p, 8000); } },
     { name:'黄忠', icon:'🏹', title:'百步穿杨', text:'随机拆掉一名对手的一栋建筑', star3:'【万箭齐发】拆掉所有对手的全部建筑', star3fn:function(p){ var me=player.indexOf(p),n=0; for(var i=0;i<square.length;i++){var q=square[i]; if(q.owner>0&&q.owner!==me&&(q.house>0||q.hotel)){q.house=0;q.hotel=0;n++;}} addAlert('【万箭齐发】拆掉 '+n+' 处建筑。'); }, fn:function(p){ demolishOne(p); } },
     { name:'马超', icon:'🐴', title:'西凉铁骑', text:'向前移动 3 格', star3:'【西凉铁骑】前进 10 格', star3fn:function(p){ move(p,10); }, fn:function(p){ move(p, 3); } },
-    { name:'周瑜', icon:'🔥', title:'火烧连营', text:'所有对手各失去 10% 现金', star3:'【火烧赤壁】所有对手各失去 30% 现金', star3fn:function(p){ allOpponents(p,function(o){ var t=Math.round(o.money*0.3); o.money-=t; addAlert(o.name+' 失去 $'+t+'。'); }); }, fn:function(p){ allOpponents(p, function(o){ lose(o, Math.round(o.money*0.1), true); }); } },
+    { name:'周瑜', icon:'🔥', title:'火烧连营', text:'所有对手各失去 10% 现金', star3:'【火烧赤壁】所有对手各失去 30% 现金', star3fn:function(p){ allOpponents(p,function(o){ var t=Math.max(0, Math.round(o.money*0.3)); o.money-=t; addAlert(o.name+' 失去 $'+t+'。'); }); }, fn:function(p){ allOpponents(p, function(o){ lose(o, Math.max(0, Math.round(o.money*0.1)), true); }); } },
     { name:'张辽', icon:'🛡️', title:'威震逍遥津', text:'下 2 次踩地免交过路费', star3:'【威震逍遥津】永久免过路费 5 次', star3fn:function(p){ p.starFreeRent=(p.starFreeRent||0)+5; }, fn:function(p){ p.starFreeRent = (p.starFreeRent||0) + 2; } },
-    { name:'甘宁', icon:'⛵', title:'百骑劫营', text:'随机指定一名对手，夺走该对手 15% 现金', star3:'【百骑劫营】每名对手各被抢走 25%', star3fn:function(p){ allOpponents(p,function(o){ var t=Math.round(o.money*0.25); o.money-=t; p.money+=t; addAlert(o.name+' 被抢 $'+t+'。'); }); }, fn:function(p){ takePercentOne(p, 15); } }
+    { name:'甘宁', icon:'⛵', title:'百骑劫营', text:'随机指定一名对手，夺走该对手 15% 现金', star3:'【百骑劫营】每名对手各被抢走 25%', star3fn:function(p){ allOpponents(p,function(o){ var t=Math.max(0, Math.round(o.money*0.25)); o.money-=t; p.money+=t; addAlert(o.name+' 被抢 $'+t+'。'); }); }, fn:function(p){ takePercentOne(p, 15); } }
   ];
 
   /* ---------- 神明卡（地煞系：偏运气，有正有负） ---------- */
@@ -39,9 +39,9 @@
     { name:'复制', icon:'🪞', title:'镜花水月', text:'复制上一张抽到的卡，再执行一次', fn:function(p){ repeatLast(p); } },
     { name:'倍数', icon:'✖️', title:'三倍暴击', text:'立即领取当前现金的 200%', fn:function(p){ gain(p, p.money*2, true); } },
     { name:'翻倍', icon:'🎲', title:'孤注一掷', text:'现金翻倍，但 50% 概率全部归零', fn:function(p){ if(rnd(2)===0){ gain(p, p.money, true); } else { var l=p.money-1000; if(l>0){ p.money=1000; addAlert('【孤注一掷】'+p.name+' 输光了，只剩 $1000。'); } } } },
-    { name:'吸血', icon:'🩸', title:'血魔附体', text:'每名对手各被夺走 10% 现金', fn:function(p){ allOpponents(p, function(o){ var t=Math.round(o.money*0.1); o.money-=t; p.money+=t; addAlert(o.name+' 被抽走 $'+t+'。'); }); } },
+    { name:'吸血', icon:'🩸', title:'血魔附体', text:'每名对手各被夺走 10% 现金', fn:function(p){ allOpponents(p, function(o){ var t=Math.max(0, Math.round(o.money*0.1)); o.money-=t; p.money+=t; addAlert(o.name+' 被抽走 $'+t+'。'); }); } },
     { name:'清零', icon:'💧', title:'散财童子', text:'随机一名对手现金减半', fn:function(p){ halveOne(p); } },
-    { name:'税收', icon:'📜', title:'苛政猛于虎', text:'所有对手按总资产 5% 缴税给你', fn:function(p){ allOpponents(p, function(o){ var t=Math.round(o.money*0.05); if(t>0){ o.money-=t; p.money+=t; addAlert(o.name+' 缴税 $'+t+'。'); } }); } },
+    { name:'税收', icon:'📜', title:'苛政猛于虎', text:'所有对手按总资产 5% 缴税给你', fn:function(p){ allOpponents(p, function(o){ var t=Math.max(0, Math.round(o.money*0.05)); if(t>0){ o.money-=t; p.money+=t; addAlert(o.name+' 缴税 $'+t+'。'); } }); } },
     { name:'拆迁', icon:'🚜', title:'推土机', text:'拆掉所有对手建筑', fn:function(p){ var me=player.indexOf(p), n=0; for(var i=0;i<square.length;i++){ var s=square[i]; if(s.owner>0&&s.owner!==me&&(s.house>0||s.hotel)){ s.house=0; s.hotel=0; n++; } } gain(p, n*15000); } },
     { name:'天命', icon:'☯️', title:'天命所归', text:'免费获得一块无主空地', fn:function(p){ teleportFree(p); } }
   ];
@@ -185,7 +185,7 @@
     '天机星': { title:'【智多星】连续再掷 3 次骰子', fn:function(p){ p.starExtraRoll=(p.starExtraRoll||0)+3; } },
     '天闲星': { title:'【入云龙】传送到最贵的无主地并免费获得', fn:function(p){ freeBest(p); } },
     '天勇星': { title:'【大刀】强制以原价一半买下当前地标', fn:function(p){ if(typeof square!=='undefined' && square[p.position] && square[p.position].price>0 && square[p.position].owner===0){ var q=square[p.position]; p.money-=Math.round(q.price*0.5); q.owner=player.indexOf(p); updateOwned(); addAlert('【大刀】半价拿下 '+q.name+'。'); } else { gain(p,15000); } } },
-    '天雄星': { title:'【豹子头】所有对手各向你支付其总资产的 15%', fn:function(p){ allOpponents(p,function(o){ var t=Math.round(o.money*0.15); o.money-=t; p.money+=t; addAlert(o.name+' 向 '+p.name+' 支付 $'+t+'。'); }); } },
+    '天雄星': { title:'【豹子头】所有对手各向你支付其总资产的 15%', fn:function(p){ allOpponents(p,function(o){ var t=Math.max(0, Math.round(o.money*0.15)); o.money-=t; p.money+=t; addAlert(o.name+' 向 '+p.name+' 支付 $'+t+'。'); }); } },
     '天猛星': { title:'【霹雳火】摧毁所有对手的全部建筑', fn:function(p){ var me=player.indexOf(p),n=0; for(var i=0;i<square.length;i++){var q=square[i]; if(q.owner>0&&q.owner!==me&&(q.house>0||q.hotel)){q.house=0;q.hotel=0;n++;}} addAlert('【霹雳火】拆掉 '+n+' 处建筑。'); } },
     '天威星': { title:'【双鞭】所有对手现金减半', fn:function(p){ allOpponents(p,function(o){ o.money=Math.round(o.money/2); addAlert(o.name+' 现金减半。'); }); } },
     '天英星': { title:'【小李广】所有对手下回合无法移动', fn:function(p){ allOpponents(p,function(o){ o.starLimitMove=0; o.jail=true; o.jailroll=0; addAlert(o.name+' 被定身入狱。'); }); } },
@@ -200,9 +200,9 @@
     '天佑星': { title:'【金枪手】免死 3 次，并在破产时保留 50% 资产', fn:function(p){ p.starBankruptShield=(p.starBankruptShield||0)+3; } },
     '天空星': { title:'【急先锋】前进 30 格', fn:function(p){ move(p,30); } },
     '天速星': { title:'【神行太保】连续再掷 3 次骰子', fn:function(p){ p.starExtraRoll=(p.starExtraRoll||0)+3; } },
-    '天异星': { title:'【赤发鬼】每名对手各被偷走 25% 现金', fn:function(p){ allOpponents(p,function(o){ var t=Math.round(o.money*0.25); o.money-=t; p.money+=t; addAlert(o.name+' 被偷 $'+t+'。'); }); } },
+    '天异星': { title:'【赤发鬼】每名对手各被偷走 25% 现金', fn:function(p){ allOpponents(p,function(o){ var t=Math.max(0, Math.round(o.money*0.25)); o.money-=t; p.money+=t; addAlert(o.name+' 被偷 $'+t+'。'); }); } },
     '天杀星': { title:'【黑旋风】所有对手全部进监狱', fn:function(p){ allOpponents(p,function(o){ o.jail=true; o.jailroll=0; addAlert(o.name+' 被送进监狱。'); }); } },
-    '天微星': { title:'【九纹龙】所有对手失去全部免罪道具，并各扣 25% 现金', fn:function(p){ allOpponents(p,function(o){ o.starJailCard=0; o.starFreeRent=0; var t=Math.round(o.money*0.25); o.money-=t; addAlert(o.name+' 被缴械并损失 $'+t+'。'); }); } },
+    '天微星': { title:'【九纹龙】所有对手失去全部免罪道具，并各扣 25% 现金', fn:function(p){ allOpponents(p,function(o){ o.starJailCard=0; o.starFreeRent=0; var t=Math.max(0, Math.round(o.money*0.25)); o.money-=t; addAlert(o.name+' 被缴械并损失 $'+t+'。'); }); } },
     '天究星': { title:'【没遮拦】每有一块无主地，领取现金的 5%', fn:function(p){ var n=0; for(var i=0;i<square.length;i++){ if(square[i].price>0 && square[i].owner===0) n++; } gain(p, Math.round(p.money*0.05*n), true); } },
     '天退星': { title:'【插翅虎】后退 5 格并领取 20000', fn:function(p){ move(p,-5); gain(p,20000); } },
     '天寿星': { title:'【混江龙】下回合骰子点数 ×3', fn:function(p){ p.starDoubleDice=(p.starDoubleDice||1)*3; } },
@@ -261,7 +261,7 @@
   function takePercentOne(p,pct){
     var o=opponents(p); if(!o.length){ gain(p,5000); return; }
     var t=o[rnd(o.length)];
-    var amt=Math.min(Math.round(t.money*pct/100) * (window.__STAR_MULT||1), t.money);
+    var amt=Math.max(0, Math.min(Math.round(Math.max(0,t.money)*pct/100) * (window.__STAR_MULT||1), Math.max(0,t.money)));
     t.money-=amt; p.money+=amt; addAlert('【随机】'+p.name+' 抽中 '+t.name+'，夺走该对手 $'+amt+'。');
   }
   function demolishOne(p){
