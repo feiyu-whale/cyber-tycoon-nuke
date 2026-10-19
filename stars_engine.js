@@ -205,7 +205,7 @@
         var ops2 = getOpponents(p);
         for(var j = 0; j < ops2.length; j++){
           var o = player[ops2[j]];
-          var take = Math.min(v, o.money);
+          var take = Math.max(0, Math.min(v, o.money));
           o.money -= take;
           p.money += take;
         }
@@ -215,7 +215,7 @@
         var t1 = randomOpponent(p);
         if(t1 !== null){
           var op1 = player[t1];
-          var take1 = Math.min(Math.max(v, Math.round(op1.money * PCT_OPP)), op1.money);
+          var take1 = Math.max(0, Math.min(Math.max(v, Math.round(op1.money * PCT_OPP)), op1.money));
           op1.money -= take1;
           p.money += take1;
         }
@@ -224,7 +224,7 @@
         var t2 = randomOpponent(p);
         if(t2 !== null){
           var op2 = player[t2];
-          var take2 = Math.round(op2.money * v / 100);
+          var take2 = Math.max(0, Math.round(op2.money * v / 100));
           op2.money -= take2;
           p.money += take2;
         }
@@ -233,7 +233,7 @@
         var t3 = randomOpponent(p);
         if(t3 !== null){
           var op3 = player[t3];
-          var take3 = Math.round(op3.money * v / 100);
+          var take3 = Math.max(0, Math.round(op3.money * v / 100));
           op3.money -= take3;
           p.money += take3;
         }
