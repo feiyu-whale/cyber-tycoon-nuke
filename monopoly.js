@@ -2276,12 +2276,7 @@ function sellHouse(index) {
 	}
 
 	var gain = sq.houseprice * 0.5;
-	if (cash < 0 && debtMode && gain > -cash) {
-		/* 回滚刚才的房屋数量变更 */
-		if (sq.hotel === 0 && sq.house === 4) { sq.hotel = 1; sq.house = 0; } else { sq.house++; }
-		addAlert('【负债锁】' + p.name + ' 卖这栋房能换 $' + gain + '，但欠款只有 $' + (-cash) + '，超出部分不允许变现。');
-		return;
-	}
+	/* v41：同 bug1——还债模式下不再因为「超额」回滚，卖了就把钱留下抵债。 */
 	p.money += gain;
 	updateOwned();
 	updateMoney();
@@ -2464,17 +2459,17 @@ function mortgage(index) {
 	var mortgagePrice = Math.round(sq.price * 0.5);
 	var unmortgagePrice = Math.round(sq.price * 0.55);
 
-	/* v40：负债状态下，只允许押到把现金拉回 >= 0；超出部分照样锁死。 */
+	/* v41 修 bug1（chip-nesi #178 复验指出）：
+	 * v40 要求每笔抵押价 <= 欠款，导致必须「子集和精确命中」才能上岸——
+	 * 欠 800、手上一块地抵押价 1800，竟因 1800 > 800 被拒 → 照样破产。
+	 *
+	 * 改为「覆盖式」：还债模式下，抵押价能一次性抵平欠款就放行（超额部分 = 找零）。
+	 * 押不起（不够抵平）也放行——多押一块只会让现金更快回正，不会刷出图；
+	 * 防刷靠的是「负债时禁买地 / 禁赎回」，不靠禁超额。
+	 * 真人的负债锁照旧：非还债模式、现金为负 → 一律不许主动抵押。 */
 	if (cash < 0 && !debtMode) {
 		addAlert('【负债锁】' + p.name + ' 现金为负（' + fmtMoney(cash) + '），负债期间不能主动抵押。');
 		return false;
-	}
-	if (cash < 0 && debtMode) {
-		var need = -cash;
-		if (mortgagePrice > need) {
-			addAlert('【负债锁】' + p.name + ' 抵押 ' + sq.name + ' 只能换 $' + mortgagePrice + '，但欠款只有 $' + need + '，超出部分不允许变现。');
-			return false;
-		}
 	}
 
 	sq.mortgage = true;
@@ -2483,7 +2478,7 @@ function mortgage(index) {
 	document.getElementById("mortgagebutton").value = "赎回 $" + unmortgagePrice;
 	document.getElementById("mortgagebutton").title = "赎回 " + sq.name + " for $" + unmortgagePrice + ".";
 
-	addAlert(p.name + " 把 " + sq.name + " 抵押出去，换得 $" + mortgagePrice + "。" + (cash < 0 ? '（还债模式）' : ''));
+	addAlert(p.name + " 把 " + sq.name + " 抵押出去，换得 $" + mortgagePrice + "。" + (cash < 0 ? '（还债模式，抵平后余款留作现金）' : ''));
 	updateOwned();
 	updateMoney();
 

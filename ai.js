@@ -174,13 +174,32 @@ function AITest(p) {
 
 	// Mortgage enough properties to pay debt.
 	// Return: void: don't return anything, just call the functions mortgage()/sellhouse()
+	/* v41 修 bug2（chip-nesi #178 复验指出）：
+	 * v40 只循环空地抵押，看到房子就跳过 → 财富全在房子上的 AI 永远救不了自己。
+	 * 改为两轮：① 先押空地；② 还不够就把房子卖了继续抵债。 */
 	this.payDebt = function() {
 		console.log("payDebt");
+
+		/* 第一轮：抵押空地（只处理 house===0 且未抵押的） */
 		for (var i = 39; i >= 0; i--) {
 			s = square[i];
 
-			if (s.owner === p.index && !s.mortgage && s.house === 0) {
-				mortgage(i, true);   /* v40：还债模式，只押到抵平债务 */
+			if (s.owner === p.index && !s.mortgage && s.house === 0 && s.hotel === 0) {
+				mortgage(i, true);   /* v41：还债模式，抵平即止，超额留现金 */
+				console.log(s.name);
+			}
+
+			if (p.money >= 0) {
+				return;
+			}
+		}
+
+		/* 第二轮：地上还有房子/旅馆 → 卖房抵债（v41 新增调用点） */
+		for (var j = 39; j >= 0; j--) {
+			s = square[j];
+
+			if (s.owner === p.index && (s.house > 0 || s.hotel > 0)) {
+				sellHouse(j, true);
 				console.log(s.name);
 			}
 
