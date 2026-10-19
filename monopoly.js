@@ -1911,10 +1911,8 @@ function communityChestAction(communityChestIndex) {
 
 function addamount(amount, cause) {
 	var p = player[turn];
-
-	p.money += amount;
-
-	addAlert(p.name + " 从 " + cause + " 获得 $" + amount + "。");
+	/* 2026-10-19 v38：改走 income()，负资产时先抵债 */
+	income(p, amount, cause);
 }
 
 function subtractamount(amount, cause) {
@@ -2004,18 +2002,16 @@ function advance(destination, pass) {
 			p.position = pass;
 		} else {
 			p.position = pass;
-			p.money += 200;
+			income(p, 200, "经过起点");
 			p.coins = (p.coins || 0) + 1;
-		addAlert(p.name + " 经过起点，领取 $200，并获得 1 金币。");
 		}
 	}
 	if (p.position < destination) {
 		p.position = destination;
 	} else {
 		p.position = destination;
-		p.money += 200;
+		income(p, 200, "经过起点");
 		p.coins = (p.coins || 0) + 1;
-		addAlert(p.name + " 经过起点，领取 $200，并获得 1 金币。");
 	}
 
 	land();
@@ -2030,9 +2026,8 @@ function advanceToNearestUtility() {
 		p.position = 28;
 	} else if (p.position >= 28) {
 		p.position = 12;
-		p.money += 200;
+		income(p, 200, "经过起点");
 		p.coins = (p.coins || 0) + 1;
-		addAlert(p.name + " 经过起点，领取 $200，并获得 1 金币。");
 	}
 
 	land(true);
@@ -2049,9 +2044,8 @@ function advanceToNearestRailroad() {
 		p.position = 25;
 	} else if (p.position >= 35) {
 		p.position = 5;
-		p.money += 200;
+		income(p, 200, "经过起点");
 		p.coins = (p.coins || 0) + 1;
-		addAlert(p.name + " 经过起点，领取 $200，并获得 1 金币。");
 	}
 
 	land(true);
@@ -2213,6 +2207,33 @@ function buyHouse(index) {
 }
 
 /* 2026-10-18 老爹定：计税/计价基数 = 现金 + 金币折现（防止换金币逃税） */
+
+/* 2026-10-19 v38 修负资产漏洞：统一「收入」入口
+ *   负资产状态下，任何收入先抵债；抵完还有剩，才进钱包。
+ *   返回实际进钱包的金额（0 表示全抵债了） */
+function income(p, amount, cause){
+	if(!p || !(amount > 0)) return 0;
+	if((p.money || 0) < 0){
+		var debt = -p.money;
+		var used = Math.min(debt, amount);
+		p.money += used;
+		var left = amount - used;
+		if(used > 0){
+			addAlert('【抵债】' + p.name + ' 的 $' + used + ' 收入直接抵债（剩余欠款 $' + Math.max(0, -p.money) + '）' + (cause ? '（来源：' + cause + '）' : ''));
+		}
+		if(left > 0){
+			p.money += left;
+			if(cause) addAlert(p.name + ' 从 ' + cause + ' 获得 $' + left + '。');
+			return left;
+		}
+		return 0;
+	}
+	p.money += amount;
+	if(cause) addAlert(p.name + ' 从 ' + cause + ' 获得 $' + amount + '。');
+	return amount;
+}
+window.income = income;
+
 function cashBase(p){
 	if(!p) return 0;
 	return (p.money || 0) + (p.coins || 0) * 10000;
@@ -2230,6 +2251,12 @@ function houseCost(sq, p) {
 function sellHouse(index) {
 	sq = square[index];
 	p = player[sq.owner];
+
+	/* 2026-10-19 v38 修负资产漏洞：负债状态下禁止卖房（防「卖房→少欠债→变相白拿」） */
+	if ((p.money || 0) < 0) {
+		addAlert('【负债锁】' + p.name + ' 现金为负（' + fmtMoney(p.money) + '），负债期间不能卖房。先还清债务。');
+		return;
+	}
 
 	if (sq.hotel === 1) {
 		sq.hotel = 0;
@@ -2379,8 +2406,14 @@ function buy() {
 	var property = square[p.position];
 	var cost = property.price;
 
-	if (p.money >= cost) {
-		p.pay(cost, 0);
+	/* 2026-10-19 v38 修负资产漏洞：买地不再只看现金，改比「现金 + 金币折现」
+	 *   现金为负时 cashBase 更低，买不了；有钱人照样能买 */
+	if (cashBase(p) >= cost) {
+		var _buyPaid = p.pay(cost, 0);
+		if (_buyPaid === false) {
+			popup("<p>" + p.name + "，你还差 $" + (property.price - cashBase(p)) + " 才能买下 " + property.name + "。</p>");
+			return;
+		}
 
 		property.owner = turn;
 		updateMoney();
@@ -2395,13 +2428,19 @@ function buy() {
 		}
 
 	} else {
-		popup("<p>" + p.name + "，你还差 $" + (property.price - p.money) + " 才能买下 " + property.name + "。</p>");
+		popup("<p>" + p.name + "，你还差 $" + (property.price - cashBase(p)) + " 才能买下 " + property.name + "。</p>");
 	}
 }
 
 function mortgage(index) {
 	var sq = square[index];
 	var p = player[sq.owner];
+
+	/* 2026-10-19 v38 修负资产漏洞：负债状态下禁止抵押（防「抵押→买地→再抵押」刷图） */
+	if ((p.money || 0) < 0) {
+		addAlert('【负债锁】' + p.name + ' 现金为负（' + fmtMoney(p.money) + '），负债期间不能抵押。先还清债务。');
+		return false;
+	}
 
 	if (sq.house > 0 || sq.hotel > 0 || sq.mortgage) {
 		return false;
@@ -2462,9 +2501,8 @@ function moveAnimated(steps, callback) {
 		if (dir > 0) {
 			p.position = (p.position + 1) % 40;
 			if (p.position === 0) {
-				p.money += 200;
+				income(p, 200, "经过起点");
 				p.coins = (p.coins || 0) + 1;
-		addAlert(p.name + " 经过起点，领取 $200，并获得 1 金币。");
 				updateMoney();
 			}
 			// 2026-10-18：滚雪成山——经过四个角各结算一次利息
@@ -2597,7 +2635,7 @@ function land(increasedRent) {
 		}
 		addAlert(p.name + " 向 " + player[s.owner].name + " 支付了 $" + rent + " 租金。");
 		p.pay(rent, s.owner);
-		player[s.owner].money += rent;
+		income(player[s.owner], rent, '收租');
 
 		document.getElementById("landed").innerHTML = "你落在了 " + s.name + ". " + player[s.owner].name + " collected $" + rent + " rent.";
 	} else if (s.owner > 0 && s.owner != turn && s.mortgage) {
@@ -2632,13 +2670,13 @@ function land(increasedRent) {
 	if (p.position === 20) {
 		var win = Math.random() < 0.10;
 		if (win) {
-			p.money += 3000;
+			income(p, 3000, "彩票中奖");
 			popup("<div style='text-align:center'><div style='font-size:34px'>🎰</div><div style='font-size:19px;font-weight:900;color:#ffd86a;margin:8px 0'>彩票中大奖！</div><div style='font-size:14px'>" + p.name + " 喜提 $3000</div></div>", function() {
 				updateMoney();
 				if (!p.human && !p.AI.onLand()) { game.next(); }
 			});
 		} else {
-			p.money += 200;
+			income(p, 200, "彩票安慰奖");
 			popup("<div style='text-align:center'><div style='font-size:34px'>🎟️</div><div style='font-size:17px;font-weight:700;margin:8px 0'>一张也没中</div><div style='font-size:13px;color:#a8c4dc'>" + p.name + " 领到安慰奖 $200</div></div>", function() {
 				updateMoney();
 				if (!p.human && !p.AI.onLand()) { game.next(); }
