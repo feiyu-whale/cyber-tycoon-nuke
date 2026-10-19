@@ -209,7 +209,7 @@
     var html =
       '<div style="padding:16px 14px 10px">'+
         '<div style="text-align:center;font-size:15px;font-weight:900;color:#c9a961;letter-spacing:3px;margin-bottom:3px">\u2728 天罡地煞赐福</div>'+
-        '<div style="text-align:center;font-size:11px;color:#8a7f68;margin-bottom:9px">'+p.name+' 请择其一 · 全员票多者胜</div>'+
+        '<div style="text-align:center;font-size:11px;color:#8a7f68;margin-bottom:9px">'+p.name+' 请择其一 · 全员票多者胜（平票随机定）</div>'+
         rows+
       '</div>';
 

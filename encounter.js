@@ -27,7 +27,7 @@
     },
     {
       id:'grace', name:'财神眷顾', weight:20, color:'#ffd86a',
-      desc:'本局所有现金类收益提升 20%'
+      desc:'本局卡牌现金收益提升 20%（工资与收租不计）'
     },
     {
       id:'blaze', name:'烈火烹油', weight:15, color:'#ff9a4a',

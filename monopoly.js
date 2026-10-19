@@ -1134,6 +1134,18 @@ function Player(name, color) {
 	// this.AI = null;
 
 	this.pay = function (amount, creditor) {
+		/* 2026-10-19 老爹定：所有付款统一处理——现金不够就自动兑金币（1 金币 = 10000 现金），
+		 *   兑到刚好够为止；兑完还不够，才走原来的付不起流程（破产判定）。 */
+		if (amount > this.money && (this.coins || 0) > 0) {
+			var short = amount - this.money;
+			var need = Math.ceil(short / 10000);
+			var use = Math.min(need, this.coins);
+			if (use > 0) {
+				this.coins -= use;
+				this.money += use * 10000;
+				addAlert('【自动兑换】' + this.name + ' 现金不足，自动兑换 ' + use + ' 金币（+$' + (use * 10000) + '）用于支付。');
+			}
+		}
 		if (amount <= this.money) {
 			this.money -= amount;
 
@@ -2140,7 +2152,10 @@ function buyHouse(index) {
 	var houseSum = 0;
 	var hotelSum = 0;
 
-	if (p.money - sq.houseprice < 0) {
+	/* 2026-10-19 修负资产：门槛改查「实付价」houseCost（原价 + 计价基数×25%），不再只看原价
+	 *   2026-10-19 老爹定：门槛比的是总资产（现金 + 金币折现），够了就放行，由 pay() 自动兑金币支付 */
+	var realCost = houseCost(sq, p);
+	if (cashBase(p) < realCost) {
 		if (sq.house == 4) {
 			return false;
 		} else {
@@ -2176,9 +2191,21 @@ function buyHouse(index) {
 			}
 		}
 
-		var realCost = houseCost(sq, p);
 		addAlert(p.name + ' 盖房花费 $' + realCost + '（原价 $' + sq.houseprice + ' + 现金 25%）');
-		p.pay(realCost, 0);
+		/* 2026-10-19 修负资产：扣款失败则回滚，不留半截状态 */
+		var _paid = p.pay(realCost, 0);
+		if (_paid === false) {
+			if (sq.hotel === 1) {
+				sq.hotel = 0;
+				sq.house = 4;
+			} else {
+				sq.house--;
+			}
+			addAlert(p.name + ' 现金不足，盖房失败（需 $' + realCost + '）');
+			updateOwned();
+			updateMoney();
+			return false;
+		}
 
 		updateOwned();
 		updateMoney();
