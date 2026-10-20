@@ -177,37 +177,56 @@ function AITest(p) {
 	/* v41 修 bug2（chip-nesi #178 复验指出）：
 	 * v40 只循环空地抵押，看到房子就跳过 → 财富全在房子上的 AI 永远救不了自己。
 	 * 改为两轮：① 先押空地；② 还不够就把房子卖了继续抵债。 */
+	/* v42 修（task #179 复验指出，反例 D/E/F）：
+	 * v41 的两轮是写死的：
+	 *   ① 第二轮对每块地只调一次 sellHouse()（一栋/一次，旅馆只拆一次）；
+	 *   ② 卖房腾空的地不会回到抵押轮；
+	 *   ③ 调用方只调一次 payDebt()，回来仍为负直接判破产。
+	 * → 欠 25000、同块地 3 栋房（值 30000）只卖 1 栋；旅馆只兑 1 个单位；
+	 *   卖房后腾空的地本可再抵押回正，却没有第三轮。
+	 * v42 改为单一 while 循环：抵押空地 → 卖房 → 再抵押腾空地，
+	 * 直到「债务还清」或「再无可押可卖资产」为止，不再写死轮数。 */
 	this.payDebt = function() {
 		console.log("payDebt");
 
-		/* 第一轮：抵押空地（只处理 house===0 且未抵押的） */
-		for (var i = 39; i >= 0; i--) {
-			s = square[i];
+		var guard = 0;
+		while (p.money < 0 && guard++ < 400) {
+			var acted = false;
 
-			if (s.owner === p.index && !s.mortgage && s.house === 0 && s.hotel === 0) {
-				mortgage(i, true);   /* v41：还债模式，抵平即止，超额留现金 */
-				console.log(s.name);
+			/* ① 抵押空地 */
+			for (var i = 39; i >= 0 && p.money < 0; i--) {
+				s = square[i];
+				if (s.owner === p.index && !s.mortgage && s.house === 0 && s.hotel === 0) {
+					if (mortgage(i, true)) {
+						console.log(s.name);
+						acted = true;
+						if (p.money >= 0) break;
+					}
+				}
+			}
+			if (p.money >= 0) return;
+
+			/* ② 卖房/卖旅馆抵债——v42 修：同一块地连卖到腾空为止 */
+			for (var j = 39; j >= 0 && p.money < 0; j--) {
+				s = square[j];
+				if (s.owner !== p.index) continue;
+
+				var innerGuard = 0;
+				while (p.money < 0 && (s.house > 0 || s.hotel > 0) && innerGuard++ < 10) {
+					sellHouse(j, true);
+					console.log(s.name);
+					acted = true;
+				}
+				if (p.money >= 0) return;
 			}
 
-			if (p.money >= 0) {
+			/* ③ 卖房腾空的地，下一轮循环自动回到 ① 被抵押 */
+
+			if (!acted) {
+				console.warn("[payDebt] 无可变现资产，剩余债务 " + p.money);
 				return;
 			}
 		}
-
-		/* 第二轮：地上还有房子/旅馆 → 卖房抵债（v41 新增调用点） */
-		for (var j = 39; j >= 0; j--) {
-			s = square[j];
-
-			if (s.owner === p.index && (s.house > 0 || s.hotel > 0)) {
-				sellHouse(j, true);
-				console.log(s.name);
-			}
-
-			if (p.money >= 0) {
-				return;
-			}
-		}
-
 	}
 
 	// Determine what to bid during an auction.
