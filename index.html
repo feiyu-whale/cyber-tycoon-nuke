@@ -476,11 +476,26 @@
 
 		<div id="onlinePanel" style="display:none;margin:10px 0;padding:12px;background:#0a1420;border:1px solid #35597a;border-radius:12px;">
 			<div style="font-size:11px;color:#8fb3cf;margin-bottom:10px;text-align:center;">联机对战 · 双人</div>
+			<!-- 2026-10-20 v43 两套联机并存：模式切换 -->
+			<div style="display:flex;gap:6px;margin-bottom:10px;">
+				<input type="button" id="modeRoomBtn" value="🏠 服务器中转（稳）" onclick="setOnlineMode('room');"
+					style="flex:1;font-size:11px;background:linear-gradient(160deg,#2a7a4a,#1a5030);border-color:#3fa06a;color:#d0ffe0;" />
+				<input type="button" id="modeP2PBtn" value="⚡ 直连 P2P（快）" onclick="setOnlineMode('p2p');"
+					style="flex:1;font-size:11px;background:#243818;border-color:#4a6a2a;color:#a8c090;" />
+			</div>
+			<div id="onlineModeTip" style="font-size:10px;color:#6a8fb0;text-align:center;margin-bottom:10px;line-height:1.6;">
+				服务器中转：只要两边能打开网页就能玩，稳。适合手机与电脑联机。
+			</div>
 			<div style="display:flex;gap:8px;margin-bottom:10px;">
-				<input type="button" value="创建房间" onclick="onlineCreate();" style="flex:1;" />
-				<input type="button" value="加入房间" onclick="onlineJoinPrompt();" style="flex:1;background:linear-gradient(160deg,#3a5a8a,#254060);" />
+				<input type="button" id="onlineCreateBtn" value="创建房间" onclick="onlineDispatch('create');" style="flex:1;" />
+				<input type="button" id="onlineJoinBtn" value="加入房间" onclick="onlineDispatch('join');" style="flex:1;background:linear-gradient(160deg,#3a5a8a,#254060);" />
 			</div>
 			<div id="onlineStatus" style="font-size:11px;color:#6a8fb0;text-align:center;line-height:1.7;min-height:20px;">未连接</div>
+			<!-- 2026-10-20 v43 联机开局按钮：双方就位后房主可开 -->
+			<div id="onlineStartBox" style="display:none;margin-top:10px;">
+				<input type="button" id="onlineStartBtn" value="开始联机对局（房主点）" onclick="onlineDispatch('start');"
+					style="width:100%;background:linear-gradient(160deg,#2a7a4a,#1a5030);border-color:#3fa06a;color:#d0ffe0;" />
+			</div>
 			<div id="onlineRoomBox" style="display:none;margin-top:10px;padding:10px;background:#101e2c;border:1px dashed #35597a;border-radius:10px;text-align:center;">
 				<div style="font-size:10px;color:#6a8fb0;">房间号</div>
 				<div id="onlineRoomId" style="font-size:22px;font-weight:900;color:#ffd860;letter-spacing:4px;margin:4px 0;"></div>
@@ -493,7 +508,7 @@
 		地标图标来自 <a href="images/landmarks/CREDITS.md" style="color:#4a6a8a">VeryIcon · hide-best</a>，站点声明可免费商用<br />
 		游戏本体移植自 <a href="https://github.com/intrepidcoder/monopoly" target="_blank" rel="noopener noreferrer" style="color:#4a6a8a">intrepidcoder/monopoly</a>（MIT 许可）
 	</div>
-	<div style="text-align:center;font-size:10px;color:#2a3a48;margin-top:6px">v42-还债循环重写 20261020</div>
+	<div style="text-align:center;font-size:10px;color:#2a3a48;margin-top:6px">v43-双引擎联机 20261020</div>
 	</div>
 
 	<div id="control">

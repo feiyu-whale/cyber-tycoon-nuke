@@ -18,7 +18,9 @@
     conn: null,
     roomCode: null,
     connected: false,
-    libLoading: false
+    libLoading: false,
+    started: false,     // 2026-10-20 v43 是否已开局
+    seed: null
   };
 
   /* ---------- 状态显示 ---------- */
@@ -26,6 +28,13 @@
     var el = document.getElementById('onlineStatus');
     if(el){ el.textContent = txt; el.style.color = color || '#6a8fb0'; }
   }
+  function showStartBoxIfHost(){
+    if(S.role === 'host' && S.connected){
+      var sb = document.getElementById('onlineStartBox');
+      if(sb) sb.style.display = 'block';
+    }
+  }
+
   function showRoom(code){
     var box = document.getElementById('onlineRoomBox');
     var idEl = document.getElementById('onlineRoomId');
@@ -89,6 +98,7 @@
           if(window.addAlert) addAlert('【联机】对方已加入房间，可以开始了。');
           // 把初始状态发过去
           sendStateFull();
+          showStartBoxIfHost();   // 2026-10-20 v43 显示开局按钮
         });
       });
 
@@ -208,6 +218,17 @@
         if(window.addAlert) addAlert('【对手】' + msg.text);
         break;
 
+      case 'start':
+        /* 2026-10-20 v43 P2P 开局：客方收到房主的 start -> 同种子开局 */
+        if(S.role === 'guest' && !S.started && msg.seed !== undefined){
+          S.started = true;
+          S.seed = msg.seed;
+          var sp = document.getElementById('onlinePanel'); if(sp) sp.style.display = 'none';
+          if(window.addAlert) addAlert('【联机】对局开始。');
+          if(typeof setup === 'function') setup(msg.seed);
+        }
+        break;
+
       default:
         break;
     }
@@ -304,6 +325,21 @@
       if(window.addAlert) addAlert(text);
       send({ t: 'alert', text: text });
     }
+  };
+
+  /* 2026-10-20 v43 P2P 开局：房主生成种子，本地开局并通知客方 */
+  window.p2pStartGame = function(){
+    if(S.role !== 'host'){ setStatus('只有房主能开始对局', '#ff9aa8'); return; }
+    if(!S.connected){ setStatus('对方还没连上', '#ff9aa8'); return; }
+    if(S.started) return;
+    S.started = true;
+    var seed = (Math.floor(Math.random() * 2147483646) + 1);
+    S.seed = seed;
+    send({ t: 'start', seed: seed });
+    var sb = document.getElementById('onlineStartBox'); if(sb) sb.style.display = 'none';
+    var pn = document.getElementById('onlinePanel'); if(pn) pn.style.display = 'none';
+    if(window.addAlert) addAlert('【联机】对局开始（你发起了本局）。');
+    if(typeof setup === 'function') setup(seed);
   };
 
   window.P2P = {

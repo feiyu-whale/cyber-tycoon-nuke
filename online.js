@@ -18,7 +18,10 @@
     roomId: null,
     seat: null,
     since: 0,
-    timer: null
+    timer: null,
+    started: false,     // 2026-10-20 v43 联机是否已开局
+    seed: null,
+    mySeat: 0
   };
 
   function setStatus(txt, color) {
@@ -44,7 +47,7 @@
     p.style.display = p.style.display === 'none' ? 'block' : 'none';
   };
 
-  window.onlineCreate = function () {
+  window.roomCreate = function () {
     setStatus('正在创建房间…');
     post('/create', {}).then(function (d) {
       if (!d.ok) { setStatus('创建失败：' + (d.err || '未知'), '#ff9aa8'); return; }
@@ -60,7 +63,7 @@
     });
   };
 
-  window.onlineJoinPrompt = function () {
+  window.roomJoinPrompt = function () {
     var rid = prompt('请输入对方的房间号：');
     if (!rid) return;
     rid = rid.trim().toLowerCase();
@@ -95,7 +98,12 @@
             return;
           }
           if (d.seats >= 2) {
-            setStatus('双方已就位 · 房间 ' + state.roomId, '#7fd4a8');
+            if (!state.started) {
+              setStatus('双方已就位 · 房间 ' + state.roomId, '#7fd4a8');
+              // 2026-10-20 v43：双方就位 -> 房主可点开始
+              var sb = document.getElementById('onlineStartBox');
+              if (sb) sb.style.display = 'block';
+            }
           }
           if (d.ops && d.ops.length) {
             d.ops.forEach(function (op) {
@@ -117,9 +125,32 @@
   }
 
   /* ---------- 推操作 ---------- */
-  window.pushOp = function (op) {
+  window.roomPushOp = function (op) {
     if (!state.roomId) return;
     post('/op', { id: state.roomId, seat: state.seat, op: op }).catch(function () {});
+  };
+
+  /* ---------- 2026-10-20 v43 开局 ---------- */
+  window.roomStartGame = function () {
+    if (!state.roomId) { setStatus('还没进房间', '#ff9aa8'); return; }
+    if (state.seat !== 0) { setStatus('只有房主能开始对局', '#ff9aa8'); return; }
+    if (state.started) return;
+    if (state.seat === null || state.seat === undefined) { setStatus('座位信息丢失，请重新建房', '#ff9aa8'); return; }
+
+    state.started = true;
+    // 房主生成种子（1 ~ 2^31），推给对方
+    var seed = (Math.floor(Math.random() * 2147483646) + 1);
+    state.seed = seed;
+    window.roomPushOp({ type: 'start', seed: seed });
+
+    var sb = document.getElementById('onlineStartBox');
+    if (sb) sb.style.display = 'none';
+    var pnl = document.getElementById('onlinePanel');
+    if (pnl) pnl.style.display = 'none';
+    setStatus('对局开始 · 房间 ' + state.roomId, '#7fd4a8');
+
+    // 房主本地同样用这个种子开局
+    if (typeof setup === 'function') setup(seed);
   };
 
   /* ---------- 重放对方操作 ---------- */
@@ -127,6 +158,19 @@
     if (!op || !op.type) return;
     try {
       switch (op.type) {
+        case 'start':
+          // 2026-10-20 v43 联机开局：收到房主的开始信号 -> 用同一个种子开局
+          if (!state.started) {
+            state.started = true;
+            var sb2 = document.getElementById('onlineStartBox');
+            if (sb2) sb2.style.display = 'none';
+            var pnl = document.getElementById('onlinePanel');
+            if (pnl) pnl.style.display = 'none';
+            setStatus('对局开始 · 房间 ' + state.roomId, '#7fd4a8');
+            if (typeof setup === 'function') setup(op.seed);
+          }
+          break;
+
         case 'buy':
           // 对方买下地皮：本地把该格归属改过去
           if (typeof square !== 'undefined' && square[op.pos]) {
@@ -175,10 +219,75 @@
     }
   }
 
-  window.MonopolyOnline = {
+  /* ============================================================
+   * 2026-10-20 v43 两套联机并存 · 模式调度
+   * mode = 'room'  -> 服务器中转（online.js / RoomOnline）
+   * mode = 'p2p'   -> WebRTC 直连（p2p.js / MonopolyOnline）
+   * 页面按钮统一走 onlineDispatch()
+   * ============================================================ */
+  var onlineMode = 'room';
+
+  window.setOnlineMode = function (m) {
+    if (m !== 'room' && m !== 'p2p') return;
+    onlineMode = m;
+    var rb = document.getElementById('modeRoomBtn');
+    var pb = document.getElementById('modeP2PBtn');
+    var tip = document.getElementById('onlineModeTip');
+    if (rb && pb) {
+      if (m === 'room') {
+        rb.style.background = 'linear-gradient(160deg,#2a7a4a,#1a5030)';
+        rb.style.borderColor = '#3fa06a';
+        rb.style.color = '#d0ffe0';
+        pb.style.background = '#243818';
+        pb.style.borderColor = '#4a6a2a';
+        pb.style.color = '#a8c090';
+      } else {
+        pb.style.background = 'linear-gradient(160deg,#2a7a4a,#1a5030)';
+        pb.style.borderColor = '#3fa06a';
+        pb.style.color = '#d0ffe0';
+        rb.style.background = '#243818';
+        rb.style.borderColor = '#4a6a2a';
+        rb.style.color = '#a8c090';
+      }
+    }
+    if (tip) {
+      tip.textContent = (m === 'room')
+        ? '服务器中转：只要两边能打开网页就能玩，稳。适合手机与电脑联机。'
+        : '直连 P2P：数据不经过服务器、延迟更低，但部分网络环境打不通。';
+    }
+    setStatus(m === 'room' ? '模式：服务器中转（未连接）' : '模式：直连 P2P（未连接）');
+  };
+
+  /* 统一入口：页面所有联机按钮都调这个 */
+  window.onlineDispatch = function (action) {
+    if (onlineMode === 'p2p') {
+      var P = window.MonopolyOnline;
+      if (!P) { setStatus('P2P 模块未加载', '#ff9aa8'); return; }
+      if (action === 'create') { if (typeof window.onlineCreate === 'function') window.onlineCreate(); }
+      else if (action === 'join') { if (typeof window.onlineJoinPrompt === 'function') window.onlineJoinPrompt(); }
+      else if (action === 'start') {
+        if (typeof window.p2pStartGame === 'function') window.p2pStartGame();
+        else setStatus('P2P 开局功能未就绪', '#ff9aa8');
+      }
+      return;
+    }
+    // room 模式
+    if (action === 'create') { window.roomCreate(); }
+    else if (action === 'join') { window.roomJoinPrompt(); }
+    else if (action === 'start') { window.roomStartGame(); }
+  };
+
+  window.getOnlineMode = function () { return onlineMode; };
+
+  /* 2026-10-20 v43 改名：原来叫 MonopolyOnline，被 p2p.js 覆盖
+   * 现在两套并存：RoomOnline = 服务器中转 / MonopolyOnline = P2P 直连 */
+  window.RoomOnline = {
     state: state,
     isActive: function () { return !!state.roomId; },
     mySeat: function () { return state.seat; },
-    push: function (op) { window.pushOp(op); }
+    create: function () { window.roomCreate(); },
+    join: function () { window.roomJoinPrompt(); },
+    start: function () { window.roomStartGame(); },
+    push: function (op) { window.roomPushOp(op); }
   };
 })();

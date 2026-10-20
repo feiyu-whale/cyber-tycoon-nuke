@@ -1208,6 +1208,27 @@ var player = [];
 var pcount;
 var turn = 0, doublecount = 0;
 // Overwrite an array with numbers from one to the array's length in a random order.
+/* ============================================================
+ * 2026-10-20 v43 联机开局 · 可播种随机数
+ * 目的：联机两边用同一个种子，保证玩家顺序/隐藏卡/奇遇/赐福投票一致
+ * 用法：rngSeed(12345) 之后，rng() 返回 0~1 的伪随机数
+ *       不播种时 rng() 等同 Math.random（单机行为完全不变）
+ * ============================================================ */
+var _rngState = null;
+function rngSeed(seed) {
+	_rngState = (seed === null || seed === undefined) ? null : (seed >>> 0) || 1;
+}
+function rng() {
+	if (_rngState === null) return Math.random();
+	// xorshift32：快、够用、结果可复现
+	var x = _rngState;
+	x ^= x << 13; x >>>= 0;
+	x ^= x >> 17;
+	x ^= x << 5;  x >>>= 0;
+	_rngState = x;
+	return x / 4294967296;
+}
+
 Array.prototype.randomize = function(length) {
 	length = (length || this.length);
 	var num;
@@ -1219,7 +1240,7 @@ Array.prototype.randomize = function(length) {
 
 	for (var i = 0; i < length; i++) {
 		// Generate random number between 0 and indexArray.length - 1.
-		num = Math.floor(Math.random() * indexArray.length);
+		num = Math.floor(rng() * indexArray.length);
 		this[i] = indexArray[num] + 1;
 
 		indexArray.splice(num, 1);
@@ -2968,7 +2989,17 @@ if (document.readyState === "loading") {
 	initRotateHint();
 }
 
-function setup() {
+function setup(seed) {
+	/* 2026-10-20 v43 联机开局：可选种子参数
+	 * 联机时两边用同一个种子 -> 玩家顺序/牌堆/随机事件一致
+	 * 单机不传参 -> rngSeed(null) -> 等同 Math.random，行为不变 */
+	if (arguments.length > 0) {
+		rngSeed(seed);
+		if (window.MonopolyOnline && window.MonopolyOnline.isActive()) {
+			// 联机固定两人，互相看得清
+			document.getElementById("playernumber").value = "2";
+		}
+	}
 	pcount = parseInt(document.getElementById("playernumber").value, 10);
 
 	var playerArray = new Array(pcount);
@@ -3141,8 +3172,8 @@ window.onload = function() {
 	}
 
 	// Shuffle Chance and Community Chest decks.
-	chanceCards.deck.sort(function() {return Math.random() - 0.5;});
-	communityChestCards.deck.sort(function() {return Math.random() - 0.5;});
+	chanceCards.deck.sort(function() {return rng() - 0.5;});
+	communityChestCards.deck.sort(function() {return rng() - 0.5;});
 
 	$("#playernumber").on("change", playernumber_onchange);
 	playernumber_onchange();
