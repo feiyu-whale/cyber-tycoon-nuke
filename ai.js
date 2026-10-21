@@ -197,9 +197,11 @@ function AITest(p) {
 			for (var i = 39; i >= 0 && p.money < 0; i--) {
 				s = square[i];
 				if (s.owner === p.index && !s.mortgage && s.house === 0 && s.hotel === 0) {
+					var _m1 = p.money;
 					if (mortgage(i, true)) {
 						console.log(s.name);
-						acted = true;
+						/* 同上：抵押也要求真有进账才算进展 */
+						if (p.money !== _m1) acted = true;
 						if (p.money >= 0) break;
 					}
 				}
@@ -213,9 +215,13 @@ function AITest(p) {
 
 				var innerGuard = 0;
 				while (p.money < 0 && (s.house > 0 || s.hotel > 0) && innerGuard++ < 10) {
-					sellHouse(j, true);
+					/* 2026-10-21 v44（#181 复验指出）：只有真产生进展才算 acted。
+					 * 原来无条件置 true，卖房失败/无进账时测不出来，会空转到 guard。 */
+					var _m0 = p.money, _u0 = s.house + 5 * s.hotel;
+					var _ok = sellHouse(j, true);
 					console.log(s.name);
-					acted = true;
+					if (_ok !== false && (p.money !== _m0 || (s.house + 5 * s.hotel) < _u0)) acted = true;
+					else if (_ok === false) break; /* 无可卖建筑，别在同一个格子空转 */
 				}
 				if (p.money >= 0) return;
 			}

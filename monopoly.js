@@ -2291,7 +2291,17 @@ function sellHouse(index) {
 		return;
 	}
 
-	if (sq.hotel === 1) {
+	/* 2026-10-21 v44（#181 复验指出）：加前置校验。
+	 * 原逻辑 hotel===1 精确判断，若出现 hotel>1 的异常状态会走 else 分支
+	 * house-- 且旅馆永不减少 → 钱凭空变出来、house 变负。
+	 * 改成 hotel>0 走旅馆分支；无房无旅馆直接返回 false。 */
+	if (sq.house <= 0 && !(sq.hotel > 0)) {
+		addAlert(p.name + " 的 " + sq.name + " 上没有可卖的建筑。");
+		return false;
+	}
+
+	if (sq.hotel > 0) {
+		/* 正常状态 hotel 只有 0/1；异常值（>1）也归零，不留半截状态 */
 		sq.hotel = 0;
 		sq.house = 4;
 		addAlert(p.name + " 卖掉了 " + sq.name + " 上的旅馆。");
@@ -2305,6 +2315,7 @@ function sellHouse(index) {
 	p.money += gain;
 	updateOwned();
 	updateMoney();
+	return true;
 }
 
 function showStats() {
